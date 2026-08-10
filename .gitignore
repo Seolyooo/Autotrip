@@ -1,0 +1,14 @@
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+# API 키 등 민감 정보 (나중에 사용 시 대비)
+*.keystore
+google-services.json
+local.env
