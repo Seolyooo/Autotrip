@@ -6,13 +6,13 @@ plugins {
 android {
     namespace = "com.example.autotrip"
     compileSdk {
-        version = release(37)
+        version = release(36)
     }
 
     defaultConfig {
         applicationId = "com.example.autotrip"
-        minSdk = 24
-        targetSdk = 37
+        minSdk = 26
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
