@@ -1,8 +1,7 @@
-package com.example.autotrip.ui.auth
+package com.example.autotrip.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LoginScreen(
-    onLoginClick: () -> Unit
+fun HomeScreen(
+    onTravelClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -26,31 +25,30 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        // 로고
         Text(
-            text = "AutoTrip",
-            fontSize = 40.sp
+            text = "메인화면",
+            fontSize = 36.sp
         )
 
-        Spacer(modifier = Modifier.height(60.dp))
+        Text(
+            text = "나만의 여행을 시작해보세요",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(top = 12.dp, bottom = 40.dp)
+        )
 
+        // 여행하기 버튼
         Button(
-            onClick = onLoginClick,
+            onClick = onTravelClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp)
+                .height(56.dp)
         ) {
-            Text("Google로 로그인")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = onLoginClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-        ) {
-            Text("이메일로 로그인")
+            Text(
+                text = "여행하기",
+                fontSize = 18.sp
+            )
         }
     }
 }
