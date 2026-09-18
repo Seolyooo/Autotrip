@@ -11,6 +11,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.autotrip.ui.auth.LoginScreen
 import com.example.autotrip.ui.auth.SplashScreen
+import com.example.autotrip.ui.budget.BudgetDetailScreen
+import com.example.autotrip.ui.budget.BudgetMainScreen
+import com.example.autotrip.ui.budget.ExpenseEntryScreen
 import com.example.autotrip.ui.home.HomeScreen
 import com.example.autotrip.ui.plan.PlanScreen
 import com.example.autotrip.ui.plan.TripCreateScreen
@@ -31,6 +34,9 @@ class MainActivity : ComponentActivity() {
                 var showHome by remember { mutableStateOf(false) }
                 var showPlan by remember { mutableStateOf(false) }
                 var showTripCreate by remember { mutableStateOf(false) }
+                var showBudget by remember { mutableStateOf(false) }
+                var showBudgetDetail by remember { mutableStateOf(false) }
+                var showExpense by remember { mutableStateOf(false) }
 
                 // Splash 2.5초
                 LaunchedEffect(Unit) {
@@ -63,12 +69,54 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // 4. 메인
+                    // 4. 가계부 상세내역
+                    showBudgetDetail -> {
+                        BudgetDetailScreen(
+                            onBackClick = {
+                                showBudgetDetail = false
+                            }
+                        )
+                    }
+
+                    // 5. 지출 직접 입력
+                    showExpense -> {
+                        ExpenseEntryScreen(
+                            onBackClick = {
+                                showExpense = false
+                            },
+                            onSaveClick = {
+                                showExpense = false
+                            }
+                        )
+                    }
+
+                    // 6. 가계부
+                    showBudget -> {
+                        BudgetMainScreen(
+                            onBackClick = {
+                                showBudget = false
+                            },
+                            onSeeDetailClick = {
+                                showBudgetDetail = true
+                            },
+                            onManualAddClick = {
+                                showExpense = true
+                            }
+                        )
+                    }
+
+                    // 5. 메인
                     showHome -> {
                         HomeScreen(
                             onTravelClick = {
                                 showHome = true
                                 showPlan = true
+                            },
+                            onAddClick = {
+                                showPlan = true
+                            },
+                            onNavigateToBudget = {
+                                showBudget = true
                             }
                         )
                     }
