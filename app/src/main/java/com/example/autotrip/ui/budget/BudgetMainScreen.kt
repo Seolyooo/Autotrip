@@ -2,6 +2,7 @@ package com.example.autotrip.ui.budget
 // Epic: 예산 관리
 // TODO: 화면 구현 예정
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -93,6 +94,7 @@ fun BudgetMainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable(onClick = onSeeDetailClick)
                         .padding(vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -102,13 +104,11 @@ fun BudgetMainScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
-                    IconButton(onClick = onSeeDetailClick) {
-                        Icon(
-                            Icons.Default.ChevronRight,
-                            contentDescription = "상세내역으로 이동",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    Icon(
+                        Icons.Default.ChevronRight,
+                        contentDescription = "상세내역으로 이동",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
 
