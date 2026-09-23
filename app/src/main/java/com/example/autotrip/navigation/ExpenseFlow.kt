@@ -16,8 +16,6 @@ import com.example.autotrip.ui.expense.ExpenseListScreen
 import com.example.autotrip.ui.expense.ExpenseListUiState
 import com.example.autotrip.ui.expense.ExpensePlanListScreen
 import com.example.autotrip.ui.expense.ExpensePlanListUiState
-import com.example.autotrip.ui.expense.ExpensePrepaidFormScreen
-import com.example.autotrip.ui.expense.ExpensePrepaidFormUiState
 import com.example.autotrip.ui.expense.ExpenseReceiptReviewScreen
 import com.example.autotrip.ui.expense.ExpenseReceiptReviewUiState
 import com.example.autotrip.ui.expense.ExpenseRecordFormScreen
@@ -53,7 +51,7 @@ fun ExpenseFlow(onExit: () -> Unit) {
             onCashWalletClick = { navigate(ExpenseRoute.CashWallet) },
             onSettlementClick = { navigate(ExpenseRoute.Settlement) },
             onPlanListClick = { navigate(ExpenseRoute.PlanList) },
-            onPrepaidClick = { navigate(ExpenseRoute.PrepaidForm) },
+            onPrepaidClick = { navigate(ExpenseRoute.RecordForm()) },
             onExpenseListClick = { navigate(ExpenseRoute.ExpenseList) },
             onTripReportClick = { navigate(ExpenseRoute.TripReport) },
         )
@@ -61,13 +59,8 @@ fun ExpenseFlow(onExit: () -> Unit) {
         ExpenseRoute.PlanList -> ExpensePlanListScreen(
             state = ExpensePlanListUiState(),
             onBack = { pop() },
-            onConvertToPrepaidClick = { navigate(ExpenseRoute.PrepaidForm) },
-        )
-
-        ExpenseRoute.PrepaidForm -> ExpensePrepaidFormScreen(
-            state = ExpensePrepaidFormUiState(),
-            onBack = { pop() },
-            onSaveClick = { pop() },
+            // TODO: 02 샘플 생기면 누른 계획 항목을 RecordForm에 넘겨 '계획 항목 연결'을 채울 것
+            onConvertToPrepaidClick = { navigate(ExpenseRoute.RecordForm()) },
         )
 
         ExpenseRoute.Settlement -> ExpenseSettlementScreen(
