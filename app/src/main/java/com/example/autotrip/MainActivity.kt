@@ -9,15 +9,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.autotrip.navigation.ExpenseFlow
 import com.example.autotrip.ui.auth.EmailLoginScreen
 import com.example.autotrip.ui.auth.GoogleLoginScreen
 import com.example.autotrip.ui.auth.LoginScreen
 import com.example.autotrip.ui.auth.SignUpCompleteScreen
 import com.example.autotrip.ui.auth.SignUpScreen
 import com.example.autotrip.ui.auth.SplashScreen
-import com.example.autotrip.ui.budget.BudgetDetailScreen
-import com.example.autotrip.ui.budget.BudgetMainScreen
-import com.example.autotrip.ui.budget.ExpenseEntryScreen
 import com.example.autotrip.ui.home.HomeScreen
 import com.example.autotrip.ui.plan.PlanScreen
 import com.example.autotrip.ui.plan.TripCreateScreen
@@ -38,9 +36,7 @@ class MainActivity : ComponentActivity() {
                 var showHome by remember { mutableStateOf(false) }
                 var showPlan by remember { mutableStateOf(false) }
                 var showTripCreate by remember { mutableStateOf(false) }
-                var showBudget by remember { mutableStateOf(false) }
-                var showBudgetDetail by remember { mutableStateOf(false) }
-                var showExpense by remember { mutableStateOf(false) }
+                var showExpenseFlow by remember { mutableStateOf(false) }
                 var showSignUp by remember { mutableStateOf(false) }
                 var showEmailLogin by remember { mutableStateOf(false) }
                 var showSignUpComplete by remember { mutableStateOf(false) }
@@ -77,38 +73,11 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // 4. 가계부 상세내역
-                    showBudgetDetail -> {
-                        BudgetDetailScreen(
-                            onBackClick = {
-                                showBudgetDetail = false
-                            }
-                        )
-                    }
-
-                    // 5. 지출 직접 입력
-                    showExpense -> {
-                        ExpenseEntryScreen(
-                            onBackClick = {
-                                showExpense = false
-                            },
-                            onSaveClick = {
-                                showExpense = false
-                            }
-                        )
-                    }
-
-                    // 6. 가계부
-                    showBudget -> {
-                        BudgetMainScreen(
-                            onBackClick = {
-                                showBudget = false
-                            },
-                            onSeeDetailClick = {
-                                showBudgetDetail = true
-                            },
-                            onManualAddClick = {
-                                showExpense = true
+                    // 경비 (01~12 화면 전환은 ExpenseFlow 안에서 처리)
+                    showExpenseFlow -> {
+                        ExpenseFlow(
+                            onExit = {
+                                showExpenseFlow = false
                             }
                         )
                     }
@@ -124,7 +93,7 @@ class MainActivity : ComponentActivity() {
                                 showPlan = true
                             },
                             onNavigateToBudget = {
-                                showBudget = true
+                                showExpenseFlow = true
                             }
                         )
                     }
