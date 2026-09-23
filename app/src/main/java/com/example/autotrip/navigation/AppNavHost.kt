@@ -7,7 +7,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.autotrip.ui.auth.EmailLoginScreen
+import com.example.autotrip.ui.auth.GoogleLoginScreen
 import com.example.autotrip.ui.auth.LoginScreen
+import com.example.autotrip.ui.auth.SignUpCompleteScreen
 import com.example.autotrip.ui.auth.SignUpScreen
 import com.example.autotrip.ui.auth.SplashScreen
 import com.example.autotrip.ui.budget.BudgetDetailScreen
@@ -37,6 +40,20 @@ fun AppNavHost(
         composable(Screen.Login.route) {
             LoginScreen(
                 onLoginClick = {
+                    navController.navigate(Screen.GoogleLogin.route)
+                },
+                onEmailLoginClick = {
+                    navController.navigate(Screen.EmailLogin.route)
+                },
+                onSignUpClick = {
+                    navController.navigate(Screen.SignUp.route)
+                }
+            )
+        }
+
+        composable(Screen.GoogleLogin.route) {
+            GoogleLoginScreen(
+                onGoogleContinueClick = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
@@ -44,12 +61,32 @@ fun AppNavHost(
             )
         }
 
+        composable(Screen.EmailLogin.route) {
+            EmailLoginScreen(
+                onBackClick = { navController.popBackStack() },
+                onLoginClick = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+                // 임시: onFindIdClick, onFindPasswordClick은 화면 아직 없어서 안 붙임. 다음 단계에서 연결할 것
+            )
+        }
+
         composable(Screen.SignUp.route) {
             SignUpScreen(
                 onBackClick = { navController.popBackStack() },
                 onSignUpComplete = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                    navController.navigate(Screen.SignUpComplete.route)
+                }
+            )
+        }
+
+        composable(Screen.SignUpComplete.route) {
+            SignUpCompleteScreen(
+                onConfirmClick = {
+                    navController.navigate(Screen.EmailLogin.route) {
+                        popUpTo(Screen.Login.route)
                     }
                 }
             )
