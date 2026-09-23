@@ -12,7 +12,7 @@
   - `navigation/ExpenseRoute` 정의, `navigation/ExpenseFlow` (백스택 `mutableStateListOf` + `when` + `BackHandler`)
   - 화면은 빈 자리표시로 두고 이동만 확인
   - `MainActivity`에 `ExpenseFlow` 진입 연결
-- [ ] **U3. 01 경비 홈** (`ExpenseHomeScreen.kt`)
+- [x] **U3. 01 경비 홈** (`ExpenseHomeScreen.kt`)
   - 홈에서 나가는 이동 콜백 전부 (06, 07, 08, 04, 02, 03, 09, 11)
 - [ ] **U4. 02 계획 금액 · 03 사전 결제** (`ExpensePlanListScreen.kt`, `ExpensePrepaidFormScreen.kt`)
   - 02 '결제로 전환' → 03, 03 저장/닫기 → 뒤로
@@ -35,3 +35,7 @@
   - 임시: 백스택이 `remember`라 화면 회전 시 경비 홈으로 돌아감
 - 기존 가계부 코드 정리 (2026-09-23): `ui/budget/ExpenseScreen.kt`, `ui/budget/CategoryScreen.kt`, MainActivity의 `showBudget`·`showBudgetDetail`·`showExpense` 분기 삭제. `assembleDebug` 통과
   - 논의 필요: `BudgetMainScreen`·`BudgetDetailScreen`·`BudgetModels`·`ui/budget/components`는 `navigation/AppNavHost.kt`가 import해서 남김 (AppNavHost는 어디서도 호출 안 됨)
+- U3 (2026-09-23): 01 경비 홈을 와이어프레임 배치로 채움 (여행 헤더, 내 예산 카드, 현금 지갑·정산 카드, 바로가기 4개, 최근 기록, 카메라·기록 FAB). `assembleDebug` 통과
+  - 샘플 추가: `SampleHomeSummary`(`homeSummary`), `trip.memberCountText`, `SampleExpense.categoryText`·`paidDateText`, 사전결제 `e6`(김해↔간사이 왕복), `recentExpenses`
+  - `trip.periodText`에 요일 붙임, `e5` 제목을 '난바 호텔 3박'으로 바꿈 (11 리포트·09 목록에도 반영됨)
+  - 빠진 요소: 상단 알림(종) 아이콘, 여행 이름 옆 전환 드롭다운 → 이동할 화면이 없어 보류

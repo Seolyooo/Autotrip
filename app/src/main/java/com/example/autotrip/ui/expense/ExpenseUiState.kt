@@ -10,6 +10,19 @@ import com.example.autotrip.data.sample.SampleSettlement
 data class ExpenseHomeUiState(
     val tripTitle: String = ExpenseSampleData.trip.title,
     val periodText: String = ExpenseSampleData.trip.periodText,
+    val memberCountText: String = ExpenseSampleData.trip.memberCountText,
+    val dDayText: String = ExpenseSampleData.homeSummary.dDayText,
+    val budgetText: String = ExpenseSampleData.trip.budgetPerPersonText,
+    val budgetUsedRatio: Float = ExpenseSampleData.homeSummary.budgetUsedRatio,
+    val prepaidTotalText: String = ExpenseSampleData.homeSummary.prepaidTotalText,
+    val remainingBudgetText: String = ExpenseSampleData.homeSummary.remainingBudgetText,
+    val planTotalText: String = ExpenseSampleData.homeSummary.planTotalText,
+    val planStatusText: String = ExpenseSampleData.homeSummary.planStatusText,
+    val cashBalanceText: String = ExpenseSampleData.homeSummary.cashBalanceText,
+    val cashKrwText: String = ExpenseSampleData.homeSummary.cashKrwText,
+    val settlementAmountText: String = ExpenseSampleData.homeSummary.settlementAmountText,
+    val settlementSummaryText: String = ExpenseSampleData.homeSummary.settlementSummaryText,
+    val recentExpenses: List<SampleExpense> = ExpenseSampleData.recentExpenses,
 )
 
 data class ExpensePlanListUiState(
