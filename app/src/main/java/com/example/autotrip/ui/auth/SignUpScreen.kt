@@ -34,6 +34,9 @@ fun SignUpScreen(
     onSignUpComplete: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
+    var emailVerificationSent by remember { mutableStateOf(false) }
+    var emailVerificationCode by remember { mutableStateOf("") }
+    var emailVerified by remember { mutableStateOf(false) }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
@@ -49,6 +52,7 @@ fun SignUpScreen(
 
     // 필수 항목 다 채워야 버튼 활성화 (스케치 단계 임시 조건, 정책 확정되면 조정)
     val isSignUpEnabled = email.isNotBlank() &&
+            emailVerified &&
             password.isNotBlank() &&
             name.isNotBlank() &&
             phone.isNotBlank() &&
@@ -85,14 +89,71 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("email@example.com") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                singleLine = true,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
-            )
+            ) {
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = {
+                        email = it
+                        if (emailVerified || emailVerificationSent) {
+                            emailVerified = false
+                            emailVerificationSent = false
+                            emailVerificationCode = ""
+                        }
+                    },
+                    label = { Text("email@example.com") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    singleLine = true,
+                    enabled = !emailVerified,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = { emailVerificationSent = true },
+                    enabled = email.isNotBlank() && !emailVerified,
+                    modifier = Modifier.height(56.dp)
+                ) {
+                    Text(if (emailVerified) "인증완료" else "인증번호 받기")
+                }
+            }
+
+            if (emailVerificationSent && !emailVerified) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = emailVerificationCode,
+                        onValueChange = { emailVerificationCode = it },
+                        label = { Text("인증번호 입력") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            if (emailVerificationCode.isNotBlank()) {
+                                emailVerified = true
+                            }
+                        },
+                        modifier = Modifier.height(56.dp)
+                    ) {
+                        Text("확인")
+                    }
+                }
+            }
+
+            if (emailVerified) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "✓ 이메일 인증 완료",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 

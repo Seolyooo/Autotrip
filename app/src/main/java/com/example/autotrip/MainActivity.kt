@@ -9,7 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.autotrip.ui.auth.EmailLoginScreen
+import com.example.autotrip.ui.auth.GoogleLoginScreen
 import com.example.autotrip.ui.auth.LoginScreen
+import com.example.autotrip.ui.auth.SignUpCompleteScreen
+import com.example.autotrip.ui.auth.SignUpScreen
 import com.example.autotrip.ui.auth.SplashScreen
 import com.example.autotrip.ui.budget.BudgetDetailScreen
 import com.example.autotrip.ui.budget.BudgetMainScreen
@@ -37,6 +41,10 @@ class MainActivity : ComponentActivity() {
                 var showBudget by remember { mutableStateOf(false) }
                 var showBudgetDetail by remember { mutableStateOf(false) }
                 var showExpense by remember { mutableStateOf(false) }
+                var showSignUp by remember { mutableStateOf(false) }
+                var showEmailLogin by remember { mutableStateOf(false) }
+                var showSignUpComplete by remember { mutableStateOf(false) }
+                var showGoogleLogin by remember { mutableStateOf(false) }
 
                 // Splash 2.5초
                 LaunchedEffect(Unit) {
@@ -121,11 +129,69 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+                    // 7. 회원가입 완료
+                    showSignUpComplete -> {
+                        SignUpCompleteScreen(
+                            onConfirmClick = {
+                                showSignUpComplete = false
+                                showEmailLogin = true
+                            }
+                        )
+                    }
+
+                    // 6. 회원가입
+                    showSignUp -> {
+                        SignUpScreen(
+                            onBackClick = {
+                                showSignUp = false
+                            },
+                            onSignUpComplete = {
+                                showSignUp = false
+                                showSignUpComplete = true
+                            }
+                        )
+                    }
+
+                    // 5-2. 이메일 로그인
+                    showEmailLogin -> {
+                        EmailLoginScreen(
+                            onBackClick = {
+                                showEmailLogin = false
+                            },
+                            onLoginClick = {
+                                showEmailLogin = false
+                                showHome = true
+                            },
+                            onFindIdClick = {
+                                // TODO: 아이디 찾기 화면 연결
+                            },
+                            onFindPasswordClick = {
+                                // TODO: 비밀번호 찾기 화면 연결
+                            }
+                        )
+                    }
+
+                    // Google 로그인 중간 화면
+                    showGoogleLogin -> {
+                        GoogleLoginScreen(
+                            onGoogleContinueClick = {
+                                showGoogleLogin = false
+                                showHome = true
+                            }
+                        )
+                    }
+
                     // 5. 로그인
                     else -> {
                         LoginScreen(
                             onLoginClick = {
-                                showHome = true
+                                showGoogleLogin = true
+                            },
+                            onEmailLoginClick = {
+                                showEmailLogin = true
+                            },
+                            onSignUpClick = {
+                                showSignUp = true
                             }
                         )
                     }
