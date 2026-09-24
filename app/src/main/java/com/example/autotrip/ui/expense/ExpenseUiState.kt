@@ -3,6 +3,7 @@ package com.example.autotrip.ui.expense
 import com.example.autotrip.data.sample.ExpenseSampleData
 import com.example.autotrip.data.sample.SampleExpense
 import com.example.autotrip.data.sample.SampleExpenseDayGroup
+import com.example.autotrip.data.sample.SamplePlanItem
 import com.example.autotrip.data.sample.SampleReceiptScan
 import com.example.autotrip.data.sample.SampleRecordForm
 import com.example.autotrip.data.sample.SampleSettlement
@@ -30,6 +31,10 @@ data class ExpenseHomeUiState(
 
 data class ExpensePlanListUiState(
     val tripTitle: String = ExpenseSampleData.trip.title,
+    val planTotalText: String = ExpenseSampleData.homeSummary.planTotalText,
+    val budgetText: String = ExpenseSampleData.trip.budgetPerPersonText,
+    val planItems: List<SamplePlanItem> = ExpenseSampleData.planItems,
+    val statusFilterOptions: List<String> = ExpenseSampleData.planStatusFilterOptions,
 )
 
 data class ExpenseSettlementUiState(
@@ -64,12 +69,26 @@ data class ExpenseRecordFormUiState(
             if (isBeforeTrip) ExpenseSampleData.prepaidDraft else ExpenseSampleData.duringTripDraft
 
         // 의도: 09에서 넘어온 id로 샘플 지출을 찾아 수정 모드 값을 채움
-        fun forExpense(expenseId: String?): ExpenseRecordFormUiState {
+        private fun forExpense(expenseId: String): ExpenseRecordFormUiState {
             val expense = ExpenseSampleData.findExpense(expenseId)
                 ?: return ExpenseRecordFormUiState()
             val form = ExpenseSampleData.findRecordForm(expense.id)
                 ?: return ExpenseRecordFormUiState()
             return ExpenseRecordFormUiState(editingExpense = expense, form = form)
+        }
+
+        // 의도: 02 '결제로 전환'에서 넘어온 계획 항목 id로 계획 항목 연결이 채워진 값을 만듦
+        private fun forPlanItem(planItemId: String): ExpenseRecordFormUiState {
+            val form = ExpenseSampleData.findPlanConvertForm(planItemId)
+                ?: return ExpenseRecordFormUiState()
+            return ExpenseRecordFormUiState(form = form)
+        }
+
+        // 의도: RecordForm 진입 경로(09 수정 · 02 전환 · 그 외 새 기록)를 하나로 모음
+        fun forRoute(editingExpenseId: String?, planItemId: String?): ExpenseRecordFormUiState = when {
+            editingExpenseId != null -> forExpense(editingExpenseId)
+            planItemId != null -> forPlanItem(planItemId)
+            else -> ExpenseRecordFormUiState()
         }
     }
 }

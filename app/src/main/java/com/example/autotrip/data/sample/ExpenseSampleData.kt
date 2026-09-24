@@ -106,6 +106,23 @@ data class SampleRecordForm(
     val memoText: String,
 )
 
+// 의도: 02 계획 금액 카드 하나. 결제됨/미결제/추적 세 가지 상태를 필드로 구분해서 보여줌
+data class SamplePlanItem(
+    val id: String,
+    val categoryText: String,
+    val title: String,
+    val amountLineText: String,
+    val noteLineText: String? = null,
+    // 전체/미결제/결제됨 탭 필터용
+    val statusFilterText: String,
+    val paidBadgeText: String? = null,
+    val paidBadgeChecked: Boolean = false,
+    val savedAmountText: String? = null,
+    // true면 카드에 '결제로 전환' 버튼을 보여줌
+    val isConvertible: Boolean = false,
+    val trackingBadgeText: String? = null,
+)
+
 object ExpenseSampleData {
 
     val trip = SampleTrip(
@@ -291,11 +308,55 @@ object ExpenseSampleData {
     val payMethodOptions = listOf("현금", "카드")
     val categoryOptions = listOf("식비", "교통", "항공", "숙박", "관광", "투어·입장권", "쇼핑", "기타")
     val splitModeOptions = listOf("균등 분할", "직접 입력")
-    // 임시: 02 계획 금액 샘플이 아직 없어 연결 후보를 문자열로만 둠. U4에서 02 샘플과 맞출 것
+    // 임시: 06에서 계획 항목을 직접 고를 때 쓰는 문자열 목록. 아래 02 화면용 planItems와 표현이 다를 수 있음
     val planLinkOptions = listOf(
         "숙박 · 난바 3박 (조사 600,000원)",
         "항공 · 김해↔간사이 왕복 (조사 960,000원)",
         "관광 · 주유패스 (조사 150,000원)",
+    )
+
+    // 02 계획 금액 화면
+    val planStatusFilterOptions = listOf("전체", "미결제", "결제됨")
+
+    val planItems = listOf(
+        SamplePlanItem(
+            id = "p1",
+            categoryText = "항공",
+            title = "김해↔간사이 왕복",
+            amountLineText = "조사 850,000 ~ 950,000원 (3명)",
+            noteLineText = "메모: 가격비교 앱 8/15 기준",
+            statusFilterText = "결제됨",
+            paidBadgeText = "결제됨 900,000원",
+            paidBadgeChecked = true,
+        ),
+        SamplePlanItem(
+            id = "p2",
+            categoryText = "숙박",
+            title = "난바 3박",
+            amountLineText = "조사 600,000원 (3명)",
+            noteLineText = "메모: 역 도보 5분, 조식 없음",
+            statusFilterText = "결제됨",
+            paidBadgeText = "결제됨 540,000원",
+            savedAmountText = "60,000원 절약",
+        ),
+        SamplePlanItem(
+            id = "p3",
+            categoryText = "교통",
+            title = "주유패스 2일",
+            amountLineText = "¥5,500 × 3명 = ¥16,500 ≈ 149,330원",
+            noteLineText = "환율 9.05 (수동)",
+            statusFilterText = "미결제",
+            isConvertible = true,
+        ),
+        SamplePlanItem(
+            id = "p4",
+            categoryText = "식비",
+            title = "하루 ¥6,000 × 4일",
+            amountLineText = "× 3명 = ¥72,000 ≈ 651,600원",
+            noteLineText = "여행 중 실제 지출과 비교",
+            statusFilterText = "미결제",
+            trackingBadgeText = "현지에서 추적",
+        ),
     )
 
     private val allMembers = listOf("나", "민지", "준호")
@@ -341,6 +402,29 @@ object ExpenseSampleData {
         splitModeText = "균등 분할",
         isSettlementExcluded = false,
         memoText = "",
+    )
+
+    // 의도: 02 '결제로 전환'으로 들어오는 값. p3 주유패스 계획 항목 기준
+    private val planConvertForms = mapOf(
+        "p3" to SampleRecordForm(
+            autoFillText = null,
+            planLinkText = "교통 · 주유패스 2일 (조사 149,330원)",
+            title = "주유패스 2일",
+            currencyText = "JPY ¥",
+            amountInputText = "16,500",
+            krwHintText = "≈ 149,330원 · 환율 9.05 (수동)",
+            payMethodText = "카드",
+            categoryText = "교통",
+            paidDateText = "미정",
+            useDateText = "10/10 – 10/11",
+            payerName = "나",
+            splitMemberNames = allMembers,
+            perPersonText = "1인 ¥5,500",
+            perPersonKrwText = "≈ 49,775원",
+            splitModeText = "균등 분할",
+            isSettlementExcluded = false,
+            memoText = "",
+        ),
     )
 
     // 의도: 09에서 항목 눌러 들어오는 수정 모드 값. 알림 자동 입력 문구는 없음
@@ -397,4 +481,9 @@ object ExpenseSampleData {
     fun findExpense(id: String?): SampleExpense? = expenses.firstOrNull { it.id == id }
 
     fun findRecordForm(id: String?): SampleRecordForm? = recordForms[id]
+
+    fun findPlanItem(id: String?): SamplePlanItem? = planItems.firstOrNull { it.id == id }
+
+    // 임시: 지금은 p3(주유패스)만 전환 값이 있음. 다른 계획 항목은 카드에 버튼이 없어 호출되지 않음
+    fun findPlanConvertForm(id: String?): SampleRecordForm? = planConvertForms[id]
 }

@@ -14,7 +14,7 @@
   - `MainActivity`에 `ExpenseFlow` 진입 연결
 - [x] **U3. 01 경비 홈** (`ExpenseHomeScreen.kt`)
   - 홈에서 나가는 이동 콜백 전부 (06, 07, 08, 04, 02, 03, 09, 11)
-- [ ] **U4. 02 계획 금액** (`ExpensePlanListScreen.kt`) — 03 사전 결제는 06에 합침 (U5)
+- [x] **U4. 02 계획 금액** (`ExpensePlanListScreen.kt`) — 03 사전 결제는 06에 합침 (U5)
   - 02 '결제로 전환' → 06 (계획 항목 연결 채워서)
 - [x] **U5. 06 지출 기록 · 07 영수증 확인** (`ExpenseRecordFormScreen.kt`, `ExpenseReceiptReviewScreen.kt`)
   - 06 카메라 → 07, 07 '확인하고 저장' → 뒤로 (06 거쳐 왔으면 06도 닫기)
@@ -69,3 +69,9 @@
   - 임시: 09 상단 합계(23건·988,100원)와 날짜별 소계는 실제 있는 5건 합이 아니라 와이어프레임 값 그대로 둔 샘플. '결제 금액' 탭도 같은 금액 샘플을 그대로 씀(계산 없음)
   - 빠진 요소: 검색 아이콘(이동할 화면이 없어 보류), 주유패스 제목의 '2일' 수량 표기(기존 title 필드를 다른 화면들이 같이 써서 안 건드림)
   - 논의 필요: 09의 정렬/나누기/결제수단/결제자 칩은 전부 10 시트를 열기만 함(값으로 09에서 직접 필터링 안 함). 실제로 09에서 즉시 토글하게 할지, 10에서만 바꾸게 할지는 기능 단계에서 정할 것
+- U4 (2026-09-24): 02 계획 금액을 와이어프레임 배치로 채움 (안내 문구, 계획 합계·예산 카드, 전체/미결제/결제됨 탭, 계획 항목 카드 4개 — 결제됨(체크 표시)·결제됨+절약액·미결제(결제로 전환 버튼)·현지 추적). `assembleDebug` 통과
+  - 샘플 추가: `SamplePlanItem`, `ExpenseSampleData.planItems`(p1~p4)·`planStatusFilterOptions`
+  - 02 '결제로 전환'(p3 주유패스)이 06에 계획 항목 연결을 채운 채 열리도록 연결: `ExpenseRoute.RecordForm`에 `planItemId` 추가, `ExpenseRecordFormUiState.forRoute(editingExpenseId, planItemId)`로 진입 경로 통합, 샘플 `planConvertForms["p3"]` 추가
+  - 탭 필터는 `planItems`를 `statusFilterText`로 걸러내는 화면 안 상태(계산 없음)
+  - 빠진 요소: 상단 '+' (계획 항목 추가) 아이콘 — 이동할 화면이 없어 보류
+  - 논의 필요: p1(항공)·p2(숙박)는 아직 '결제로 전환' 대상이 아님(이미 결제됨). 나중에 미결제 계획 항목이 늘어나면 각각의 전환 값도 `planConvertForms`에 추가할 것

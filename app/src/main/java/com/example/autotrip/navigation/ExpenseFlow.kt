@@ -59,8 +59,7 @@ fun ExpenseFlow(onExit: () -> Unit) {
         ExpenseRoute.PlanList -> ExpensePlanListScreen(
             state = ExpensePlanListUiState(),
             onBack = { pop() },
-            // TODO: 02 샘플 생기면 누른 계획 항목을 RecordForm에 넘겨 '계획 항목 연결'을 채울 것
-            onConvertToPrepaidClick = { navigate(ExpenseRoute.RecordForm()) },
+            onConvertToPrepaidClick = { planItemId -> navigate(ExpenseRoute.RecordForm(planItemId = planItemId)) },
         )
 
         ExpenseRoute.Settlement -> ExpenseSettlementScreen(
@@ -70,7 +69,7 @@ fun ExpenseFlow(onExit: () -> Unit) {
         )
 
         is ExpenseRoute.RecordForm -> ExpenseRecordFormScreen(
-            state = ExpenseRecordFormUiState.forExpense(current.editingExpenseId),
+            state = ExpenseRecordFormUiState.forRoute(current.editingExpenseId, current.planItemId),
             onBack = { pop() },
             onCameraClick = { navigate(ExpenseRoute.ReceiptReview) },
             onSaveClick = { pop() },
