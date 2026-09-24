@@ -6,12 +6,17 @@ import com.example.autotrip.data.sample.SampleCashUsage
 import com.example.autotrip.data.sample.SampleCashWallet
 import com.example.autotrip.data.sample.SampleExpense
 import com.example.autotrip.data.sample.SampleExpenseDayGroup
+import com.example.autotrip.data.sample.SampleInviteMember
+import com.example.autotrip.data.sample.SampleInvitePreview
 import com.example.autotrip.data.sample.SamplePlanItem
 import com.example.autotrip.data.sample.SampleReceiptScan
 import com.example.autotrip.data.sample.SampleRecordForm
 import com.example.autotrip.data.sample.SampleSettlement
 import com.example.autotrip.data.sample.SampleSettlementBasisItem
 import com.example.autotrip.data.sample.SampleSettlementSummary
+import com.example.autotrip.data.sample.SampleTripReportBasis
+import com.example.autotrip.data.sample.SampleTripReportCategoryAmount
+import com.example.autotrip.data.sample.SampleTripReportTopSpending
 
 // 의도: 화면별 UiState. 기본값은 샘플 데이터로 채움
 // TODO: 화면 채우는 단계(U3~)에서 필요한 필드 추가할 것
@@ -149,9 +154,22 @@ data class ExpenseFilterUiState(
 data class ExpenseTripReportUiState(
     val tripTitle: String = ExpenseSampleData.trip.title,
     val periodText: String = ExpenseSampleData.trip.periodText,
+    val memberCountText: String = ExpenseSampleData.trip.memberCountText,
+    val basisTabs: List<SampleTripReportBasis> = ExpenseSampleData.tripReportBasisTabs,
+    val topSpending: List<SampleTripReportTopSpending> = ExpenseSampleData.tripReportTopSpending,
+    val categoryBreakdown: List<SampleTripReportCategoryAmount> = ExpenseSampleData.tripReportCategoryBreakdown,
+    val settlementRemainingText: String = ExpenseSampleData.tripReportSettlementRemainingText,
+    val remainingCashText: String = ExpenseSampleData.tripReportRemainingCashText,
 )
 
 data class ExpenseInviteUiState(
     val tripTitle: String = ExpenseSampleData.trip.title,
-    val memberNames: List<String> = ExpenseSampleData.trip.memberNames,
+    val memberCountText: String = ExpenseSampleData.trip.memberCountText,
+    val inviteLinkText: String = ExpenseSampleData.inviteLinkText,
+    val inviteCodeText: String = ExpenseSampleData.inviteCodeText,
+    val inviteExpireText: String = ExpenseSampleData.inviteExpireText,
+    val permissionOptions: List<String> = ExpenseSampleData.invitePermissionOptions,
+    val defaultPermissionIndex: Int = ExpenseSampleData.inviteDefaultPermissionIndex,
+    val members: List<SampleInviteMember> = ExpenseSampleData.inviteMembers,
+    val preview: SampleInvitePreview = ExpenseSampleData.invitePreview,
 )

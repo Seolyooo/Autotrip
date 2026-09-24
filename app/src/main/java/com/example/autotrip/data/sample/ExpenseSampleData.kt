@@ -170,6 +170,54 @@ data class SampleCashUsage(
     val splitChipText: String? = null,
 )
 
+// 의도: 11 여행 리포트 '내 기준 / 3명 전체' 탭 하나의 표시 값
+data class SampleTripReportBasis(
+    val labelText: String,
+    val spentLabelText: String,
+    val spentAmountText: String,
+    val averageText: String,
+    val budgetCompareText: String,
+    val remainingBudgetText: String,
+    val usedRatio: Float,
+    val usedPercentText: String,
+)
+
+// 의도: 11 '가장 큰 지출' 카드 한 줄
+data class SampleTripReportTopSpending(
+    val scopeLabel: String,
+    val titleText: String,
+    val detailText: String,
+    val amountText: String,
+)
+
+// 의도: 11 '어디에 썼나' 카테고리 한 줄. barRatio는 하나의 막대를 100%로 볼 때 이 카테고리가 차지하는 비율(전체 지출 대비)을 미리 넣어둔 표시 값
+data class SampleTripReportCategoryAmount(
+    val categoryText: String,
+    val amountText: String,
+    val barRatio: Float,
+)
+
+// 의도: 12 함께보기 멤버 목록 한 줄
+data class SampleInviteMember(
+    val name: String,
+    val subtitleText: String,
+    val initial: String = name.take(1),
+)
+
+// 의도: 12 '동행인에게 보이는 화면' 미리보기의 보낼 대상 한 줄
+data class SampleInvitePreviewLine(
+    val toName: String,
+    val amountText: String,
+)
+
+// 의도: 12 하단 미리보기 카드. 특정 동행인이 보낼 금액만 모아 보여줌
+data class SampleInvitePreview(
+    val memberName: String,
+    val lines: List<SampleInvitePreviewLine>,
+    val actionButtonText: String,
+    val hintText: String,
+)
+
 object ExpenseSampleData {
 
     val trip = SampleTrip(
@@ -597,4 +645,79 @@ object ExpenseSampleData {
 
     // 임시: 지금은 p3(주유패스)만 전환 값이 있음. 다른 계획 항목은 카드에 버튼이 없어 호출되지 않음
     fun findPlanConvertForm(id: String?): SampleRecordForm? = planConvertForms[id]
+
+    // 11 여행 리포트
+    val tripReportBasisTabs = listOf(
+        SampleTripReportBasis(
+            labelText = "내 기준",
+            spentLabelText = "4일 동안 쓴 돈",
+            spentAmountText = expenseListSummary.totalAmountText,
+            averageText = "하루 평균 127,030원 · 현지 지출 기준 (사전 결제 제외)",
+            budgetCompareText = "예산 ${trip.budgetPerPersonText} 대비",
+            remainingBudgetText = "211,900원 남김",
+            usedRatio = 0.82f,
+            usedPercentText = "예산의 82% 사용",
+        ),
+        SampleTripReportBasis(
+            labelText = "3명 전체",
+            spentLabelText = "4일 동안 쓴 돈",
+            spentAmountText = "2,964,300원",
+            averageText = "하루 평균 381,090원 · 현지 지출 기준 (사전 결제 제외)",
+            budgetCompareText = "예산 3,600,000원 대비",
+            remainingBudgetText = "635,700원 남김",
+            usedRatio = 0.82f,
+            usedPercentText = "예산의 82% 사용",
+        ),
+    )
+
+    // 의도: e6 항공·e2 고베규 저녁 값을 그대로 가져와 '가장 큰 지출' 카드에 씀
+    val tripReportTopSpending = listOf(
+        SampleTripReportTopSpending(
+            scopeLabel = "전체",
+            titleText = findExpense("e6")!!.title,
+            detailText = "${findExpense("e6")!!.paidDateText} 결제 · 10/10 이용",
+            amountText = findExpense("e6")!!.myBurdenAmountText,
+        ),
+        SampleTripReportTopSpending(
+            scopeLabel = "현지",
+            titleText = findExpense("e2")!!.title,
+            detailText = "10/11(토)",
+            amountText = "86,000원",
+        ),
+    )
+
+    // 의도: barRatio 합이 1.0이 되도록 맞춤 (교통+식비+숙박+쇼핑+기타 = 988,100원 = 내 기준 탭 지출액)
+    val tripReportCategoryBreakdown = listOf(
+        SampleTripReportCategoryAmount(categoryText = "교통", amountText = "340,000원", barRatio = 0.344f),
+        SampleTripReportCategoryAmount(categoryText = "식비", amountText = "270,670원", barRatio = 0.274f),
+        SampleTripReportCategoryAmount(categoryText = "숙박", amountText = "180,000원", barRatio = 0.182f),
+        SampleTripReportCategoryAmount(categoryText = "쇼핑", amountText = "137,430원", barRatio = 0.139f),
+        SampleTripReportCategoryAmount(categoryText = "기타", amountText = "60,000원", barRatio = 0.061f),
+    )
+
+    val tripReportSettlementRemainingText = "1건 남음"
+    val tripReportRemainingCashText = "¥2,300"
+
+    // 12 함께보기 초대
+    val inviteLinkText = "autotrip.app/invite/OSK-7421"
+    val inviteCodeText = "OSK-7421"
+    val inviteExpireText = "7일 뒤 만료"
+    val invitePermissionOptions = listOf("보기만", "보기 + 자기 지출 기록")
+    val inviteDefaultPermissionIndex = 1
+
+    val inviteMembers = listOf(
+        SampleInviteMember(name = "나", subtitleText = "주인장 · 편집 · 정산 확인"),
+        SampleInviteMember(name = "민지", subtitleText = "참여 중 · 보기 + 기록"),
+        SampleInviteMember(name = "준호", subtitleText = "초대 대기 · 링크를 아직 안 열었어요"),
+    )
+
+    // 의도: 실제 정산 대상(settlements)에서 준호가 보낼 항목만 모아 미리보기로 보여줌
+    val invitePreview = SampleInvitePreview(
+        memberName = "준호",
+        lines = settlements.filter { it.fromName == "준호" }.map {
+            SampleInvitePreviewLine(toName = it.toName, amountText = it.amountText)
+        },
+        actionButtonText = "보냈어요",
+        hintText = "누르면 주인장에게 '받았어요' 확인 요청이 가요",
+    )
 }

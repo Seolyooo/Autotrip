@@ -25,9 +25,9 @@
   - 04 '동행인 함께보기 초대' → 12
 - [x] **U7. 09 소비 목록 · 10 정렬·필터** (`ExpenseListScreen.kt`, `ExpenseFilterSheet.kt`)
   - 필터 아이콘/정렬 칩 → 10 바텀시트, 항목 누름 → 06 수정 모드
-- [ ] **U8. 11 여행 리포트 + 전체 점검** (`ExpenseTripReportScreen.kt`)
-  - 11 정산 카드 → 04, 공유 → 12
-  - plan 문서 2장 연결표 전 항목 + 시스템 뒤로 동작 확인
+- [x] **U8. 11 여행 리포트 · 12 함께보기 초대** (`ExpenseTripReportScreen.kt`, `ExpenseInviteScreen.kt`)
+  - 11 정산 카드 → 04, 공유 → 12 (기존 연결 유지)
+  - [ ] plan 문서 2장 연결표 전 항목 + 시스템 뒤로 동작 확인 (전체 점검은 남음)
 
 ## 메모
 - 기존 `ui.budget` 파일과 이름 겹침 → 새 코드는 `ui.expense`/`navigation`/`data.sample` 패키지 + `Expense` 접두어로 분리, `ui.budget` import 안 함. 06은 `ExpenseRecordFormScreen`으로 이름 바꿔서 겹침 없음
@@ -88,3 +88,22 @@
   - 탭 필터는 `planItems`를 `statusFilterText`로 걸러내는 화면 안 상태(계산 없음)
   - 빠진 요소: 상단 '+' (계획 항목 추가) 아이콘 — 이동할 화면이 없어 보류
   - 논의 필요: p1(항공)·p2(숙박)는 아직 '결제로 전환' 대상이 아님(이미 결제됨). 나중에 미결제 계획 항목이 늘어나면 각각의 전환 값도 `planConvertForms`에 추가할 것
+- U8 (2026-09-24): 11 여행 리포트·12 함께보기 초대를 와이어프레임 배치로 채움
+  - 11: 여행 이름+기간·인원, '내 기준/3명 전체' 세그먼트 탭(화면 안 상태), 쓴 돈·예산 카드, 예산 대비 진행바, 가장 큰 지출 카드(전체·현지 각 1건), 어디에 썼나(카테고리별 금액 + 진행바로 표시, 와이어프레임의 색칠 막대그래프 대신), 하단 정산·남은 현금 카드
+  - 12: 링크로 초대 카드(링크·복사 버튼·초대 코드), 동행인 권한 라디오(화면 안 상태), 멤버 목록(원형 이니셜 배지 재사용 패턴), 동행인에게 보이는 화면 미리보기 카드(준호가 보낼 정산 항목을 `settlements`에서 걸러서 재사용)
+  - 샘플 추가: `SampleTripReportBasis`·`tripReportBasisTabs`(내 기준/3명 전체 2탭), `SampleTripReportTopSpending`·`tripReportTopSpending`(e6·e2 값 재사용), `SampleTripReportCategoryAmount`·`tripReportCategoryBreakdown`, `tripReportSettlementRemainingText`·`tripReportRemainingCashText`, `SampleInviteMember`·`inviteMembers`, `SampleInvitePreview`·`SampleInvitePreviewLine`·`invitePreview`(준호의 `settlements` 항목 필터), `inviteLinkText`·`inviteCodeText`·`inviteExpireText`·`invitePermissionOptions`
+  - `assembleDebug` 통과
+- U8 다듬기 (2026-09-24): '어디에 썼나'를 이미지 스타일대로 수정 (피드백 반영)
+  - 카테고리별 개별 `LinearProgressIndicator` → 막대 하나(100%)를 `barRatio`만큼 이어 붙인 `Row` + 아래 카테고리명·금액 2열 범례로 교체
+  - 색은 새로 만들지 않고 `MaterialTheme.colorScheme.onSurface`의 투명도만 카테고리 순서대로 달리해서 흑백 그라데이션 표현 (색 커스텀 금지 규칙 유지)
+  - 샘플: `SampleTripReportCategoryAmount.barRatio`를 '최대 카테고리 대비'에서 '전체 지출(988,100원) 대비 비율 합이 1.0'로 바꿈
+  - `assembleDebug` 통과
+- U8 12 재확인 (2026-09-24): 이미지와 다시 대조해 멤버 목록 마지막 항목 뒤 구분선 제거 (이미지는 항목 사이에만 있고 마지막 항목 뒤엔 없음). 나머지 배치·요소는 이미지와 일치 확인. `assembleDebug` 통과
+- U8 11 재확인 (2026-09-24): 이미지와 다시 대조. 배치·요소는 일치. 두 가지만 다듬음
+  - '예산 ... 대비' 라벨에 다른 카드 라벨과 같은 회색(`onSurfaceVariant`)을 빠뜨려서 추가 (코드 내 라벨 스타일 관례 통일)
+  - '정산' 미니 카드의 '1건 남음' 텍스트와 화살표 아이콘 사이 간격 추가
+  - `assembleDebug` 통과
+  - 빠진 요소: 11 여행 이름 옆 편집(연필) 아이콘 — 이동할 화면이 없어 보류 (기존 관례와 동일)
+  - 임시: 12 '복사'·'보냈어요' 버튼은 자리만 두고 클릭해도 동작 없음 (클립보드·확인 요청 연동은 다음 단계)
+  - 논의 필요: 11 '3명 전체' 탭 금액(2,964,300원 등)은 계산이 아니라 '내 기준' 값의 3배로 맞춰 둔 샘플 문자열. 실제 합산은 기능 단계에서
+  - 전체 점검(연결표 전 항목 + 시스템 뒤로 동작 확인)은 아직 안 함
