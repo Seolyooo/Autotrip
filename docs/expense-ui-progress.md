@@ -12,20 +12,22 @@
   - `navigation/ExpenseRoute` 정의, `navigation/ExpenseFlow` (백스택 `mutableStateListOf` + `when` + `BackHandler`)
   - 화면은 빈 자리표시로 두고 이동만 확인
   - `MainActivity`에 `ExpenseFlow` 진입 연결
-- [ ] **U3. 01 경비 홈** (`ExpenseHomeScreen.kt`)
+- [x] **U3. 01 경비 홈** (`ExpenseHomeScreen.kt`)
   - 홈에서 나가는 이동 콜백 전부 (06, 07, 08, 04, 02, 03, 09, 11)
-- [ ] **U4. 02 계획 금액 · 03 사전 결제** (`ExpensePlanListScreen.kt`, `ExpensePrepaidFormScreen.kt`)
-  - 02 '결제로 전환' → 03, 03 저장/닫기 → 뒤로
-- [ ] **U5. 06 지출 기록 · 07 영수증 확인** (`ExpenseRecordFormScreen.kt`, `ExpenseReceiptReviewScreen.kt`)
+- [x] **U4. 02 계획 금액** (`ExpensePlanListScreen.kt`) — 03 사전 결제는 06에 합침 (U5)
+  - 02 '결제로 전환' → 06 (계획 항목 연결 채워서)
+- [x] **U5. 06 지출 기록 · 07 영수증 확인** (`ExpenseRecordFormScreen.kt`, `ExpenseReceiptReviewScreen.kt`)
   - 06 카메라 → 07, 07 '확인하고 저장' → 뒤로 (06 거쳐 왔으면 06도 닫기)
   - 06 수정 모드 (샘플 값 채움)
-- [ ] **U6. 08 현금 지갑 · 04 정산 · 12 초대** (`ExpenseCashWalletScreen.kt`, `ExpenseSettlementScreen.kt`, `ExpenseInviteScreen.kt`)
+  - [x] 06 지출 기록 화면 채움 (03 사전 결제 합침, `0306 지출 추가.png` 기준)
+  - [x] 07 영수증 확인 화면 채움
+- [x] **U6-08·04. 08 현금 지갑 · 04 정산** (`ExpenseCashWalletScreen.kt`, `ExpenseSettlementScreen.kt`) — 12 초대는 아직 남음
   - 04 '동행인 함께보기 초대' → 12
-- [ ] **U7. 09 소비 목록 · 10 정렬·필터** (`ExpenseListScreen.kt`, `ExpenseFilterSheet.kt`)
+- [x] **U7. 09 소비 목록 · 10 정렬·필터** (`ExpenseListScreen.kt`, `ExpenseFilterSheet.kt`)
   - 필터 아이콘/정렬 칩 → 10 바텀시트, 항목 누름 → 06 수정 모드
-- [ ] **U8. 11 여행 리포트 + 전체 점검** (`ExpenseTripReportScreen.kt`)
-  - 11 정산 카드 → 04, 공유 → 12
-  - plan 문서 2장 연결표 전 항목 + 시스템 뒤로 동작 확인
+- [x] **U8. 11 여행 리포트 · 12 함께보기 초대** (`ExpenseTripReportScreen.kt`, `ExpenseInviteScreen.kt`)
+  - 11 정산 카드 → 04, 공유 → 12 (기존 연결 유지)
+  - [ ] plan 문서 2장 연결표 전 항목 + 시스템 뒤로 동작 확인 (전체 점검은 남음)
 
 ## 메모
 - 기존 `ui.budget` 파일과 이름 겹침 → 새 코드는 `ui.expense`/`navigation`/`data.sample` 패키지 + `Expense` 접두어로 분리, `ui.budget` import 안 함. 06은 `ExpenseRecordFormScreen`으로 이름 바꿔서 겹침 없음
@@ -35,3 +37,87 @@
   - 임시: 백스택이 `remember`라 화면 회전 시 경비 홈으로 돌아감
 - 기존 가계부 코드 정리 (2026-09-23): `ui/budget/ExpenseScreen.kt`, `ui/budget/CategoryScreen.kt`, MainActivity의 `showBudget`·`showBudgetDetail`·`showExpense` 분기 삭제. `assembleDebug` 통과
   - 논의 필요: `BudgetMainScreen`·`BudgetDetailScreen`·`BudgetModels`·`ui/budget/components`는 `navigation/AppNavHost.kt`가 import해서 남김 (AppNavHost는 어디서도 호출 안 됨)
+- U3 (2026-09-23): 01 경비 홈을 와이어프레임 배치로 채움 (여행 헤더, 내 예산 카드, 현금 지갑·정산 카드, 바로가기 4개, 최근 기록, 카메라·기록 FAB). `assembleDebug` 통과
+  - 샘플 추가: `SampleHomeSummary`(`homeSummary`), `trip.memberCountText`, `SampleExpense.categoryText`·`paidDateText`, 사전결제 `e6`(김해↔간사이 왕복), `recentExpenses`
+  - `trip.periodText`에 요일 붙임, `e5` 제목을 '난바 호텔 3박'으로 바꿈 (11 리포트·09 목록에도 반영됨)
+  - 빠진 요소: 상단 알림(종) 아이콘, 여행 이름 옆 전환 드롭다운 → 이동할 화면이 없어 보류
+- U5-06 (2026-09-24): 06 지출 기록을 와이어프레임 배치로 채움 (알림 자동 입력 안내, 통화 드롭다운, 금액 입력, 원화 환산, 결제 수단 세그먼트, 카테고리 칩, 내용 입력, 결제한 사람, 나눌 사람 + 1인 금액, 하단 저장). `assembleDebug` 통과
+  - 샘플 추가: `SampleRecordForm`, `recordFormDraft`(새 기록 = 알림 자동 입력, e1 값), e1~e4 수정 모드 폼, `currencyOptions`·`payMethodOptions`·`categoryOptions`
+  - 환산 금액은 e1(35,838원)에 맞춤. 와이어프레임 반올림 값(35,840원·11,950원)과 다름
+  - 임시: 금액·통화·나눌 사람을 바꿔도 환산·1인 금액 문구는 샘플 그대로 (계산은 기능 단계)
+  - 빠진 요소: 없음. 멤버 원형 아바타(나·민·준)는 이름 FilterChip으로 대체
+- U5-03+06 합침 (2026-09-24): 03 사전 결제와 06 지출 기록을 `ExpenseRecordFormScreen` 하나로 합침. `assembleDebug` 통과
+  - 삭제: `ExpensePrepaidFormScreen.kt`, `ExpenseRoute.PrepaidForm`, `ExpensePrepaidFormUiState`. 01 '사전 결제'·02 '결제로 전환' → `RecordForm()`
+  - 제목: 수정 모드면 '사전 결제 수정'/'지출 수정', 새 기록이면 `trip.isBeforeTrip`(임시 샘플 값)으로 '사전 결제 기록'/'지출 기록'
+  - 논의 필요: 저장 시 사전 결제 분류는 오늘이 아니라 결제일 < 여행 시작일로 정할 것 (기능 단계)
+  - 계획 항목 연결 칸: 위치 알림으로 들어오면 알림 문구, 아니면 계획 항목 드롭다운 ('연결 안 함' 포함)
+  - 와이어프레임의 '내용'은 '메모'(선택 입력)로 바꿈. 항목명이 목록에 보이는 이름
+  - 카테고리 8개(식비·교통·항공·숙박·관광·투어·입장권·쇼핑·기타), 처음엔 5개 + '…', 누르면 전부 펼침. 선택된 건 접혀도 보임
+  - 샘플: `prepaidDraft`(e5 값), `duringTripDraft`(e1 값), e1~e6 수정 모드 폼, `planLinkOptions`, `splitModeOptions`
+  - 임시: 결제일·이용일은 읽기 전용(TODO: DatePicker), 직접 입력 금액 칸은 빈 칸에서 시작
+- U5-07 (2026-09-24): 07 영수증 확인을 와이어프레임 배치로 채움 (영수증 자리 회색 박스, 인식 결과 - 금액·날짜·결제수단(판단 근거)·가게 + 확인 체크, 카테고리 카드(미분류·확인 필요 → 칩 고르면 해제), 나눌 사람 요약 + 변경 시 멤버 칩 펼침, 하단 다시 찍기·확인하고 저장). `assembleDebug` 통과
+  - 샘플 추가: `SampleReceiptScan`, `receiptScan`(e1 이치란 라멘 값 기준: ¥3,960, 2026.10.11 12:38, 현금, 一蘭 道頓堀店, 추천 카테고리 식비)
+  - 카테고리 선택지는 06의 8개 전체가 아니라 07 전용 4개(식비·쇼핑·관광·기타)로 새로 둠. 추천 항목에 '(추천)' 표시
+  - '다시 찍기'는 이동할 화면이 없어 onBack 재사용 (뒤로와 동일 동작)
+  - 임시: 카테고리·나눌 사람을 바꿔도 저장 값은 그대로 버림 (계산·저장은 기능 단계)
+  - 빠진 요소: 없음. 확인 체크·경고 아이콘은 Material 기본 Check/Warning 아이콘으로, 인식 결과 구분선은 실선(점선 대신)으로 대체
+- U7 (2026-09-24): 09 소비 목록·10 정렬·필터를 와이어프레임 배치로 채움
+  - 09: 여행 이름 드롭다운(자리만), 내 부담액/결제 금액 세그먼트 탭, 정렬·나누기·결제수단·결제자 칩 행(전부 onFilterClick), 합계 카드, 날짜별 묶음(그룹 헤더 + 항목 카드: 제목·시간, 금액 2~3줄, 결제수단·N빵·결제자·정산상태 칩)
+  - 10: 정렬/날짜(읽기 전용 + 기준)/여행/나누기/결제한 사람/결제 수단/정산 상태 전부 FilterChip 단일 선택, 초기화 버튼은 진입 시 값으로 되돌림, 'N건 보기'는 샘플 문구 그대로
+  - 샘플 추가: `SampleExpense`에 `timeText`·`myBurdenAmountText`·`myBurdenKrwText`·`totalAmountText`·`splitChipText`·`payerChipText`·`settlementChipText` 필드, `SampleExpenseDayGroup`·`SampleExpenseListSummary`, 09/10 공통 옵션 목록(`sortOptions`·`splitFilterOptions`·`payMethodFilterOptions`·`settlementFilterOptions`·`dateBasisOptions`·`tripFilterOptions`·`payerFilterOptions`)과 기본값
+  - e1~e5에 카테고리·시간·내 부담액·칩 값 채움(e6은 여행 전 항공권이라 09 목록 묶음에서 뺌, 기존대로 홈 최근기록에서만 씀)
+  - 임시: 09 상단 합계(23건·988,100원)와 날짜별 소계는 실제 있는 5건 합이 아니라 와이어프레임 값 그대로 둔 샘플. '결제 금액' 탭도 같은 금액 샘플을 그대로 씀(계산 없음)
+  - 빠진 요소: 검색 아이콘(이동할 화면이 없어 보류), 주유패스 제목의 '2일' 수량 표기(기존 title 필드를 다른 화면들이 같이 써서 안 건드림)
+  - 논의 필요: 09의 정렬/나누기/결제수단/결제자 칩은 전부 10 시트를 열기만 함(값으로 09에서 직접 필터링 안 함). 실제로 09에서 즉시 토글하게 할지, 10에서만 바꾸게 할지는 기능 단계에서 정할 것
+- U6-08·04 (2026-09-24): 08 현금 지갑·04 정산을 와이어프레임 배치로 채움
+  - 08: 잔액 요약 카드(금액·원화환산·사용/환전 진행바), 실제 잔액 맞추기·환전 추가 버튼, 재조정 안내 박스, 환전 내역, 현금 사용 목록(N빵 칩)
+  - 04: 받을 돈/보낼 돈 요약 카드 + 진행바, '정산 확인 안 함' 토글(화면 안 상태), 정산 카드 3종(완료 배지 / 받았어요 버튼 / 상대가 확인 중), 근거 항목(e5·e6 값 재사용), 하단 동행인 초대 버튼(기존 연결 유지)
+  - 샘플 추가: `SampleCashWallet`·`cashWallet`, `SampleCashExchangeRecord`·`cashExchangeRecords`, `SampleCashUsage`·`cashUsages`·`cashUsageCountText`, `SampleSettlementSummary`·`settlementSummary`, `SampleSettlementBasisItem`·`settlementBasisItems`·`settlementBasisExcludedCountText`, `SampleSettlement`에 `doneBadgeText`·`waitingText`·`actionButtonText`·이니셜 필드 추가, e6에 `myBurdenAmountText`("300,000원") 추가
+  - 사람 아바타는 U5와 동일하게 이니셜 AssistChip으로 대체
+  - `assembleDebug` 통과
+  - 빠진 요소: 08 상단 '+' 아이콘, 04 상단 공유 아이콘 — 둘 다 이동할 화면이 없어 보류(기존 관례와 동일)
+  - 임시: 08 '실제 잔액 맞추기'·'환전 추가' 버튼, 04 '받았어요' 버튼, '정산 확인 안 함' 토글은 자리만 두고 클릭해도 동작 없음 (계산·저장 로직은 다음 단계)
+- U6-04 다듬기 (2026-09-24): '누가 누구에게' 카드 수정 (피드백 반영)
+  - 이름 이니셜을 `AssistChip`(둥근 사각형) → `MemberInitialBadge`(고정 32dp 원형 Box) 로 교체. 완료 배지(✓ 받음)는 알약형이라 AssistChip 유지
+  - 카드 안 패딩 16dp→12dp, 줄 간격 8dp→6dp로 줄여 카드 목록 높이를 와이어프레임 비율에 가깝게 조정 (카드 간 간격은 그대로 둠)
+  - 임시: 원형 배지는 onClick 없음. 나중에 멤버 정보로 연결하면 32dp가 Material 권장 터치 영역(48dp)보다 작다는 점 다시 볼 것
+  - `assembleDebug` 통과
+- U4 (2026-09-24): 02 계획 금액을 와이어프레임 배치로 채움 (안내 문구, 계획 합계·예산 카드, 전체/미결제/결제됨 탭, 계획 항목 카드 4개 — 결제됨(체크 표시)·결제됨+절약액·미결제(결제로 전환 버튼)·현지 추적). `assembleDebug` 통과
+  - 샘플 추가: `SamplePlanItem`, `ExpenseSampleData.planItems`(p1~p4)·`planStatusFilterOptions`
+  - 02 '결제로 전환'(p3 주유패스)이 06에 계획 항목 연결을 채운 채 열리도록 연결: `ExpenseRoute.RecordForm`에 `planItemId` 추가, `ExpenseRecordFormUiState.forRoute(editingExpenseId, planItemId)`로 진입 경로 통합, 샘플 `planConvertForms["p3"]` 추가
+  - 탭 필터는 `planItems`를 `statusFilterText`로 걸러내는 화면 안 상태(계산 없음)
+  - 빠진 요소: 상단 '+' (계획 항목 추가) 아이콘 — 이동할 화면이 없어 보류
+  - 논의 필요: p1(항공)·p2(숙박)는 아직 '결제로 전환' 대상이 아님(이미 결제됨). 나중에 미결제 계획 항목이 늘어나면 각각의 전환 값도 `planConvertForms`에 추가할 것
+- U8 (2026-09-24): 11 여행 리포트·12 함께보기 초대를 와이어프레임 배치로 채움
+  - 11: 여행 이름+기간·인원, '내 기준/3명 전체' 세그먼트 탭(화면 안 상태), 쓴 돈·예산 카드, 예산 대비 진행바, 가장 큰 지출 카드(전체·현지 각 1건), 어디에 썼나(카테고리별 금액 + 진행바로 표시, 와이어프레임의 색칠 막대그래프 대신), 하단 정산·남은 현금 카드
+  - 12: 링크로 초대 카드(링크·복사 버튼·초대 코드), 동행인 권한 라디오(화면 안 상태), 멤버 목록(원형 이니셜 배지 재사용 패턴), 동행인에게 보이는 화면 미리보기 카드(준호가 보낼 정산 항목을 `settlements`에서 걸러서 재사용)
+  - 샘플 추가: `SampleTripReportBasis`·`tripReportBasisTabs`(내 기준/3명 전체 2탭), `SampleTripReportTopSpending`·`tripReportTopSpending`(e6·e2 값 재사용), `SampleTripReportCategoryAmount`·`tripReportCategoryBreakdown`, `tripReportSettlementRemainingText`·`tripReportRemainingCashText`, `SampleInviteMember`·`inviteMembers`, `SampleInvitePreview`·`SampleInvitePreviewLine`·`invitePreview`(준호의 `settlements` 항목 필터), `inviteLinkText`·`inviteCodeText`·`inviteExpireText`·`invitePermissionOptions`
+  - `assembleDebug` 통과
+- U8 다듬기 (2026-09-24): '어디에 썼나'를 이미지 스타일대로 수정 (피드백 반영)
+  - 카테고리별 개별 `LinearProgressIndicator` → 막대 하나(100%)를 `barRatio`만큼 이어 붙인 `Row` + 아래 카테고리명·금액 2열 범례로 교체
+  - 색은 새로 만들지 않고 `MaterialTheme.colorScheme.onSurface`의 투명도만 카테고리 순서대로 달리해서 흑백 그라데이션 표현 (색 커스텀 금지 규칙 유지)
+  - 샘플: `SampleTripReportCategoryAmount.barRatio`를 '최대 카테고리 대비'에서 '전체 지출(988,100원) 대비 비율 합이 1.0'로 바꿈
+  - `assembleDebug` 통과
+- U8 12 재확인 (2026-09-24): 이미지와 다시 대조해 멤버 목록 마지막 항목 뒤 구분선 제거 (이미지는 항목 사이에만 있고 마지막 항목 뒤엔 없음). 나머지 배치·요소는 이미지와 일치 확인. `assembleDebug` 통과
+- U8 11 재확인 (2026-09-24): 이미지와 다시 대조. 배치·요소는 일치. 두 가지만 다듬음
+  - '예산 ... 대비' 라벨에 다른 카드 라벨과 같은 회색(`onSurfaceVariant`)을 빠뜨려서 추가 (코드 내 라벨 스타일 관례 통일)
+  - '정산' 미니 카드의 '1건 남음' 텍스트와 화살표 아이콘 사이 간격 추가
+  - `assembleDebug` 통과
+- 전체 재확인 (2026-09-24): 01·02·04·06(0306)·07·08도 각 참고 이미지와 다시 대조
+  - 01·02·04·07·08: 배치·순서·요소 모두 이미지와 일치, 코드 변경 없음 (기존에 문서화된 생략 요소만 유지: 01 알림 아이콘·이름 드롭다운, 02 '+' 아이콘, 04 공유 아이콘, 08 '+' 아이콘)
+  - 06(`ExpenseRecordFormScreen.kt`): '계획 항목 연결' 라벨이 위치 알림 자동 입력 상황(06 이미지)에서도 항상 보이고 있었는데, 06 이미지는 라벨 없이 알림 박스만 있고 03 이미지(직접 계획 항목 선택)만 라벨이 있어 그에 맞게 수정 (알림 자동 입력이면 라벨 생략)
+  - 03+06을 합치며 이미 문서화된 차이(카테고리 8개 통합, 결제 수단·결제일/이용일 항상 표시, 이름 앞글자 대신 이름 전체 FilterChip)는 의도된 통합이라 그대로 둠
+  - `assembleDebug` 통과
+- 06 다듬기 (2026-09-24): '통화+금액+원화 환산' 부분 피드백 반영
+  - 금액 입력칸이 화면 폭을 꽉 채우고 있어서 이미지처럼 글자 폭 정도로 좁게(`widthIn(max = 220.dp)`) 줄임 (가운데 정렬은 그대로 유지)
+  - 통화 칩·카테고리 칩·결제한 사람/나눌 사람 칩에 `shape = CircleShape`를 줘서 이미지처럼 양옆이 반원인 알약 모양으로, 항목명·결제일·이용일·메모·직접 입력 금액 입력칸에는 `MaterialTheme.shapes.medium`을 줘서 카드류와 같은 둥근 사각형으로 통일 (Material3 기본 도형 토큰만 사용, 색은 그대로)
+  - 원화 환산·환율 문구(`form.krwHintText`)는 원래 코드에 있었음 — 기본 미리보기가 여행 전(D-17) 상태라 원화(KRW) 사전 결제 폼이 기본으로 뜨는데, KRW는 환산할 필요가 없어 문구가 원래 없는 샘플임. 엔화(JPY) 폼(예: e1 이치란 라멘 수정 모드)에서는 그대로 보임
+  - `assembleDebug` 통과
+  - 빠진 요소: 11 여행 이름 옆 편집(연필) 아이콘 — 이동할 화면이 없어 보류 (기존 관례와 동일)
+  - 임시: 12 '복사'·'보냈어요' 버튼은 자리만 두고 클릭해도 동작 없음 (클립보드·확인 요청 연동은 다음 단계)
+  - 논의 필요: 11 '3명 전체' 탭 금액(2,964,300원 등)은 계산이 아니라 '내 기준' 값의 3배로 맞춰 둔 샘플 문자열. 실제 합산은 기능 단계에서
+  - 전체 점검(연결표 전 항목 + 시스템 뒤로 동작 확인)은 아직 안 함
+- 하단 내비게이션 바 겹침 수정 (2026-09-24): 전 화면 `Scaffold`는 원래부터 `innerPadding`을 본문에 적용하고 있어 확인만 함. 시스템 nav bar 인셋을 직접 안 받는 자리(고정 버튼·FAB·바텀시트)에만 `navigationBarsPadding()` 추가
+  - `ExpenseRecordFormScreen.kt` 하단 '저장' 버튼, `ExpenseReceiptReviewScreen.kt` 하단 '다시 찍기·확인하고 저장' 버튼, `ExpenseHomeScreen.kt` 카메라·기록 FAB, `ExpenseFilterSheet.kt`(10) 바텀시트 내용
+  - 몰입 모드(하단바 숨김)는 쓰지 않음
+  - `assembleDebug` 통과

@@ -7,8 +7,11 @@ data class SampleTrip(
     val title: String,
     val periodText: String,
     val memberNames: List<String>,
+    val memberCountText: String,
     val budgetPerPersonText: String,
     val exchangeRateText: String,
+    // 임시: 오늘이 여행 시작 전인지. 날짜 비교 대신 샘플 값으로 둠 (홈 D-17 기준 true). 여행 중 화면 보려면 false로 바꿀 것
+    val isBeforeTrip: Boolean,
 )
 
 data class SampleExpense(
@@ -20,23 +23,211 @@ data class SampleExpense(
     val splitText: String,
     val payerName: String,
     val isPrepaid: Boolean = false,
+    val categoryText: String = "",
+    val paidDateText: String = "",
+    // 09 소비 목록 전용: amountText·krwAmountText는 전체 금액, 아래는 '내 부담액' 탭 표시 값
+    val timeText: String = "",
+    val myBurdenAmountText: String = amountText,
+    val myBurdenKrwText: String? = null,
+    val totalAmountText: String? = null,
+    val splitChipText: String? = null,
+    val payerChipText: String? = null,
+    val settlementChipText: String? = null,
 )
 
+// 의도: 09 소비 목록의 날짜 묶음 하나. 부담 합계는 계산하지 않고 문자열로 미리 넣어둠
+data class SampleExpenseDayGroup(
+    val dateLabel: String,
+    val myBurdenSubtotalText: String,
+    val expenses: List<SampleExpense>,
+)
+
+// 의도: 09 상단 합계 카드 값
+data class SampleExpenseListSummary(
+    val totalCountText: String,
+    val totalAmountText: String,
+)
+
+// 의도: 01 경비 홈 카드에 보이는 요약 값. 합계·비율은 계산 전이라 미리 넣어둠
+data class SampleHomeSummary(
+    val dDayText: String,
+    val budgetUsedRatio: Float,
+    val prepaidTotalText: String,
+    val remainingBudgetText: String,
+    val planTotalText: String,
+    val planStatusText: String,
+    val cashBalanceText: String,
+    val cashKrwText: String,
+    val settlementAmountText: String,
+    val settlementSummaryText: String,
+)
+
+// 의도: doneBadgeText면 완료 배지, actionButtonText면 '받았어요' 같은 확인 버튼, 둘 다 없으면 waitingText만 보여줌(상대가 확인 중)
 data class SampleSettlement(
     val fromName: String,
     val toName: String,
     val amountText: String,
     val statusText: String,
+    val fromInitial: String = fromName.take(1),
+    val toInitial: String = toName.take(1),
+    val doneBadgeText: String? = null,
+    val waitingText: String? = null,
+    val actionButtonText: String? = null,
+)
+
+// 의도: 04 정산 상단 요약 카드 값
+data class SampleSettlementSummary(
+    val receivableAmountText: String,
+    val payableAmountText: String,
+    val progressRatio: Float,
+    val completionText: String,
+)
+
+// 의도: 04 정산 '근거 항목' 한 줄. 실제 지출(SampleExpense) 값에서 가져옴
+data class SampleSettlementBasisItem(
+    val titleText: String,
+    val payerAndCountText: String,
+    val perPersonAmountText: String,
+)
+
+// 의도: 07 영수증 확인 화면에 채울 인식 결과 값. OCR 없이 미리 넣어둔 샘플
+data class SampleReceiptScan(
+    val photoPlaceholderText: String,
+    val amountText: String,
+    val dateTimeText: String,
+    val payMethodText: String,
+    val payMethodReasonText: String,
+    val storeText: String,
+    val categoryDefaultText: String,
+    val recommendedCategory: String,
+    val categoryOptions: List<String>,
+    val categoryHintText: String,
+    val splitSummaryText: String,
+)
+
+// 의도: 03+06 지출 기록 폼에 채워 넣을 값. 환산·1인 금액은 계산 전이라 문자열로 미리 넣어둠
+// 의도: autoFillText가 있으면 계획 항목 연결 칸 자리에 위치 알림 문구를 보여줌
+data class SampleRecordForm(
+    val autoFillText: String?,
+    val planLinkText: String?,
+    val title: String,
+    val currencyText: String,
+    val amountInputText: String,
+    val krwHintText: String?,
+    val payMethodText: String,
+    val categoryText: String,
+    val paidDateText: String,
+    val useDateText: String,
+    val payerName: String,
+    val splitMemberNames: List<String>,
+    val perPersonText: String,
+    val perPersonKrwText: String?,
+    val splitModeText: String,
+    val isSettlementExcluded: Boolean,
+    val memoText: String,
+)
+
+// 의도: 02 계획 금액 카드 하나. 결제됨/미결제/추적 세 가지 상태를 필드로 구분해서 보여줌
+data class SamplePlanItem(
+    val id: String,
+    val categoryText: String,
+    val title: String,
+    val amountLineText: String,
+    val noteLineText: String? = null,
+    // 전체/미결제/결제됨 탭 필터용
+    val statusFilterText: String,
+    val paidBadgeText: String? = null,
+    val paidBadgeChecked: Boolean = false,
+    val savedAmountText: String? = null,
+    // true면 카드에 '결제로 전환' 버튼을 보여줌
+    val isConvertible: Boolean = false,
+    val trackingBadgeText: String? = null,
+)
+
+// 의도: 08 현금 지갑 상단 요약 카드 값. 사용/환전 비율은 계산 전이라 미리 넣어둠
+data class SampleCashWallet(
+    val currencyLabel: String,
+    val balanceAmountText: String,
+    val balanceKrwText: String,
+    val usedRatio: Float,
+    val usedAmountText: String,
+    val exchangedAmountText: String,
+    val rebalanceExampleText: String,
+    val rebalanceResultText: String,
+)
+
+data class SampleCashExchangeRecord(
+    val dateText: String,
+    val titleText: String,
+    val detailText: String,
+    val amountText: String,
+)
+
+data class SampleCashUsage(
+    val dateText: String,
+    val title: String,
+    val amountText: String,
+    val splitChipText: String? = null,
+)
+
+// 의도: 11 여행 리포트 '내 기준 / 3명 전체' 탭 하나의 표시 값
+data class SampleTripReportBasis(
+    val labelText: String,
+    val spentLabelText: String,
+    val spentAmountText: String,
+    val averageText: String,
+    val budgetCompareText: String,
+    val remainingBudgetText: String,
+    val usedRatio: Float,
+    val usedPercentText: String,
+)
+
+// 의도: 11 '가장 큰 지출' 카드 한 줄
+data class SampleTripReportTopSpending(
+    val scopeLabel: String,
+    val titleText: String,
+    val detailText: String,
+    val amountText: String,
+)
+
+// 의도: 11 '어디에 썼나' 카테고리 한 줄. barRatio는 하나의 막대를 100%로 볼 때 이 카테고리가 차지하는 비율(전체 지출 대비)을 미리 넣어둔 표시 값
+data class SampleTripReportCategoryAmount(
+    val categoryText: String,
+    val amountText: String,
+    val barRatio: Float,
+)
+
+// 의도: 12 함께보기 멤버 목록 한 줄
+data class SampleInviteMember(
+    val name: String,
+    val subtitleText: String,
+    val initial: String = name.take(1),
+)
+
+// 의도: 12 '동행인에게 보이는 화면' 미리보기의 보낼 대상 한 줄
+data class SampleInvitePreviewLine(
+    val toName: String,
+    val amountText: String,
+)
+
+// 의도: 12 하단 미리보기 카드. 특정 동행인이 보낼 금액만 모아 보여줌
+data class SampleInvitePreview(
+    val memberName: String,
+    val lines: List<SampleInvitePreviewLine>,
+    val actionButtonText: String,
+    val hintText: String,
 )
 
 object ExpenseSampleData {
 
     val trip = SampleTrip(
         title = "오사카 3박 4일",
-        periodText = "10/10 – 10/13",
+        periodText = "10/10(금) – 10/13(월)",
         memberNames = listOf("나", "민지", "준호"),
+        memberCountText = "3명",
         budgetPerPersonText = "1,200,000원",
         exchangeRateText = "¥1 = 9.05원",
+        isBeforeTrip = true,
     )
 
     val expenses = listOf(
@@ -48,6 +239,13 @@ object ExpenseSampleData {
             payMethodText = "현금",
             splitText = "3명",
             payerName = "나",
+            categoryText = "식비",
+            timeText = "12:40",
+            myBurdenAmountText = "¥1,320",
+            myBurdenKrwText = "≈ 11,950원",
+            totalAmountText = "전체 ¥3,960",
+            splitChipText = "N빵 3",
+            payerChipText = "나 결제",
         ),
         SampleExpense(
             id = "e2",
@@ -57,6 +255,14 @@ object ExpenseSampleData {
             payMethodText = "카드",
             splitText = "3명",
             payerName = "준호",
+            categoryText = "식비",
+            timeText = "19:10",
+            myBurdenAmountText = "¥9,500",
+            myBurdenKrwText = "≈ 86,000원",
+            totalAmountText = "전체 ¥28,500",
+            splitChipText = "N빵 3",
+            payerChipText = "준호 결제",
+            settlementChipText = "정산 대기",
         ),
         SampleExpense(
             id = "e3",
@@ -66,6 +272,11 @@ object ExpenseSampleData {
             payMethodText = "현금",
             splitText = "개인",
             payerName = "나",
+            categoryText = "쇼핑",
+            timeText = "15:02",
+            myBurdenAmountText = "¥860",
+            myBurdenKrwText = "≈ 7,780원",
+            splitChipText = "개인",
         ),
         SampleExpense(
             id = "e4",
@@ -75,24 +286,438 @@ object ExpenseSampleData {
             payMethodText = "카드",
             splitText = "3명",
             payerName = "나",
+            categoryText = "교통",
+            timeText = "10:15",
+            myBurdenAmountText = "¥5,500",
+            myBurdenKrwText = "≈ 49,780원",
+            totalAmountText = "전체 ¥16,500",
+            splitChipText = "N빵 3",
+            payerChipText = "나 결제",
         ),
         SampleExpense(
             id = "e5",
-            title = "난바 호텔",
+            title = "난바 호텔 3박",
             amountText = "540,000원",
             krwAmountText = "540,000원",
             payMethodText = "사전결제",
             splitText = "3명",
             payerName = "민지",
             isPrepaid = true,
+            categoryText = "숙박",
+            paidDateText = "9/02",
+            timeText = "이용일",
+            myBurdenAmountText = "180,000원",
+            totalAmountText = "전체 540,000원",
+            payerChipText = "민지 결제",
+        ),
+        SampleExpense(
+            id = "e6",
+            title = "김해↔간사이 왕복",
+            amountText = "900,000원",
+            krwAmountText = "900,000원",
+            payMethodText = "사전결제",
+            splitText = "3명",
+            payerName = "나",
+            isPrepaid = true,
+            categoryText = "교통",
+            paidDateText = "8/20",
+            myBurdenAmountText = "300,000원",
         ),
     )
 
+    // 임시: 여행 전(D-17) 기준이라 최근 기록은 사전 결제 두 건만 둠. 정렬 기준은 기능 단계에서 정할 것
+    val recentExpenses = listOf("e5", "e6").mapNotNull { findExpense(it) }
+
+    // 09 소비 목록: 날짜별 묶음(최신순 · 이용일 기준). e6은 여행 전 항공권이라 목록에서 뺌
+    val expenseDayGroups = listOf(
+        SampleExpenseDayGroup(
+            dateLabel = "10/11 (토)",
+            myBurdenSubtotalText = "내 부담 105,730원",
+            expenses = listOf("e2", "e3", "e1").mapNotNull { findExpense(it) },
+        ),
+        SampleExpenseDayGroup(
+            dateLabel = "10/10 (금)",
+            myBurdenSubtotalText = "내 부담 229,780원",
+            expenses = listOf("e4", "e5").mapNotNull { findExpense(it) },
+        ),
+    )
+
+    // 임시: 위 두 날짜 묶음(5건)만 실제로 있고, 합계는 와이어프레임 값(23건)을 그대로 넣어둠
+    val expenseListSummary = SampleExpenseListSummary(
+        totalCountText = "23건",
+        totalAmountText = "988,100원",
+    )
+
+    // 09/10 공통: 정렬·필터 옵션과 기본 선택값
+    val sortOptions = listOf("최신순", "과거순", "금액 큰 순", "금액 작은 순")
+    val splitFilterOptions = listOf("전체", "N빵만", "개인만")
+    val payMethodFilterOptions = listOf("전체", "현금", "카드")
+    val settlementFilterOptions = listOf("전체", "미정산만")
+    val dateBasisOptions = listOf("이용일 기준", "결제일 기준")
+    val tripFilterOptions = listOf(trip.title, "전체 여행")
+    val payerFilterOptions = listOf("전체") + trip.memberNames
+
+    val defaultSortOption = sortOptions.first()
+    val defaultSplitFilter = "N빵만"
+    val defaultDateFromText = "2026.10.10"
+    val defaultDateToText = "2026.10.13"
+    // 임시: '14건 보기'는 위 필터 기본값에 맞춘 샘플 문구. 선택을 바꿔도 계산하지 않음 (기능 단계에서 처리)
+    val filterResultCountText = "14건 보기"
+
+    // 의도: 사전 결제 480,000원 = 호텔·항공 3명 분할 중 내 몫(180,000 + 300,000)으로 맞춤
+    val homeSummary = SampleHomeSummary(
+        dDayText = "D-17",
+        budgetUsedRatio = 0.4f,
+        prepaidTotalText = "480,000원",
+        remainingBudgetText = "720,000원",
+        planTotalText = "≈917,000원",
+        planStatusText = "예산 안에 들어와요",
+        cashBalanceText = "¥50,000",
+        cashKrwText = "452,500원",
+        settlementAmountText = "420,000원",
+        settlementSummaryText = "받을 돈 · 2건 대기",
+    )
+
     val settlements = listOf(
-        SampleSettlement(fromName = "민지", toName = "나", amountText = "120,000원", statusText = "받음"),
-        SampleSettlement(fromName = "준호", toName = "나", amountText = "300,000원", statusText = "보냈어요"),
-        SampleSettlement(fromName = "준호", toName = "민지", amountText = "180,000원", statusText = "대기"),
+        SampleSettlement(
+            fromName = "민지", toName = "나", amountText = "120,000원", statusText = "받음",
+            doneBadgeText = "받음 10/02",
+        ),
+        SampleSettlement(
+            fromName = "준호", toName = "나", amountText = "300,000원", statusText = "대기",
+            waitingText = "준호: 보냈어요 10/03", actionButtonText = "받았어요",
+        ),
+        SampleSettlement(
+            fromName = "준호", toName = "민지", amountText = "180,000원", statusText = "대기",
+            waitingText = "민지가 확인해요",
+        ),
+    )
+
+    val settlementSummary = SampleSettlementSummary(
+        receivableAmountText = "420,000원",
+        payableAmountText = "0원",
+        progressRatio = 0.33f,
+        completionText = "3건 중 1건 완료",
+    )
+
+    // 의도: e6 항공권·e5 숙소를 근거 항목으로 그대로 씀 (정산 대상인 e2는 제외돼 있어 '정산 제외 1건')
+    val settlementBasisItems = listOf(
+        findExpense("e6")!!.let {
+            SampleSettlementBasisItem(
+                titleText = "${it.title} ${it.krwAmountText}",
+                payerAndCountText = "${it.payerName} 결제 · ${it.splitText}",
+                perPersonAmountText = "1인 ${it.myBurdenAmountText}",
+            )
+        },
+        findExpense("e5")!!.let {
+            SampleSettlementBasisItem(
+                titleText = "${it.title} ${it.krwAmountText}",
+                payerAndCountText = "${it.payerName} 결제 · ${it.splitText}",
+                perPersonAmountText = "1인 ${it.myBurdenAmountText}",
+            )
+        },
+    )
+    val settlementBasisExcludedCountText = "정산 제외 1건"
+
+    val cashWallet = SampleCashWallet(
+        currencyLabel = "JPY",
+        balanceAmountText = "¥31,600",
+        balanceKrwText = "≈ 285,980원 · 평균 환전 환율 9.05",
+        usedRatio = 0.37f,
+        usedAmountText = "¥18,400",
+        exchangedAmountText = "¥50,000",
+        rebalanceExampleText = "실제로 세어보니 ¥30,900",
+        rebalanceResultText = "차이 ¥700을 '기록 누락'으로 자동 추가",
+    )
+
+    val cashExchangeRecords = listOf(
+        SampleCashExchangeRecord(
+            dateText = "9/28",
+            titleText = "은행 환전",
+            detailText = "낸 돈 452,500원 ÷ 받은 돈 ¥50,000 = 9.05",
+            amountText = "+¥50,000",
+        ),
+    )
+
+    val cashUsageCountText = "12건"
+    val cashUsages = listOf(
+        SampleCashUsage(dateText = "10/11", title = "이치란 라멘", amountText = "-¥3,960", splitChipText = "N빵 3"),
+        SampleCashUsage(dateText = "10/11", title = "편의점", amountText = "-¥860"),
+        SampleCashUsage(dateText = "10/10", title = "교통카드 충전", amountText = "-¥2,000"),
+        SampleCashUsage(dateText = "10/10", title = "타코야키", amountText = "-¥1,200", splitChipText = "N빵 3"),
+    )
+
+    // 의도: 07 영수증 확인 와이어프레임 값(e1 이치란 라멘 기준)으로 채움
+    val receiptScan = SampleReceiptScan(
+        photoPlaceholderText = "촬영한 영수증",
+        amountText = "¥3,960",
+        dateTimeText = "2026.10.11 12:38",
+        payMethodText = "현금",
+        payMethodReasonText = "영수증의 '現金' 표기로 판단",
+        storeText = "一蘭 道頓堀店",
+        categoryDefaultText = "미분류",
+        recommendedCategory = "식비",
+        categoryOptions = listOf("식비", "쇼핑", "관광", "기타"),
+        categoryHintText = "가게 이름으로 추천해요. 하나 고르면 끝.",
+        splitSummaryText = "최근 설정 · 3명 균등",
+    )
+
+    // 지출 기록(03+06) 선택지
+    val currencyOptions = listOf("JPY ¥", "KRW ₩")
+    val payMethodOptions = listOf("현금", "카드")
+    val categoryOptions = listOf("식비", "교통", "항공", "숙박", "관광", "투어·입장권", "쇼핑", "기타")
+    val splitModeOptions = listOf("균등 분할", "직접 입력")
+    // 임시: 06에서 계획 항목을 직접 고를 때 쓰는 문자열 목록. 아래 02 화면용 planItems와 표현이 다를 수 있음
+    val planLinkOptions = listOf(
+        "숙박 · 난바 3박 (조사 600,000원)",
+        "항공 · 김해↔간사이 왕복 (조사 960,000원)",
+        "관광 · 주유패스 (조사 150,000원)",
+    )
+
+    // 02 계획 금액 화면
+    val planStatusFilterOptions = listOf("전체", "미결제", "결제됨")
+
+    val planItems = listOf(
+        SamplePlanItem(
+            id = "p1",
+            categoryText = "항공",
+            title = "김해↔간사이 왕복",
+            amountLineText = "조사 850,000 ~ 950,000원 (3명)",
+            noteLineText = "메모: 가격비교 앱 8/15 기준",
+            statusFilterText = "결제됨",
+            paidBadgeText = "결제됨 900,000원",
+            paidBadgeChecked = true,
+        ),
+        SamplePlanItem(
+            id = "p2",
+            categoryText = "숙박",
+            title = "난바 3박",
+            amountLineText = "조사 600,000원 (3명)",
+            noteLineText = "메모: 역 도보 5분, 조식 없음",
+            statusFilterText = "결제됨",
+            paidBadgeText = "결제됨 540,000원",
+            savedAmountText = "60,000원 절약",
+        ),
+        SamplePlanItem(
+            id = "p3",
+            categoryText = "교통",
+            title = "주유패스 2일",
+            amountLineText = "¥5,500 × 3명 = ¥16,500 ≈ 149,330원",
+            noteLineText = "환율 9.05 (수동)",
+            statusFilterText = "미결제",
+            isConvertible = true,
+        ),
+        SamplePlanItem(
+            id = "p4",
+            categoryText = "식비",
+            title = "하루 ¥6,000 × 4일",
+            amountLineText = "× 3명 = ¥72,000 ≈ 651,600원",
+            noteLineText = "여행 중 실제 지출과 비교",
+            statusFilterText = "미결제",
+            trackingBadgeText = "현지에서 추적",
+        ),
+    )
+
+    private val allMembers = listOf("나", "민지", "준호")
+
+    // 의도: 여행 전 새 기록 = 사전 결제. 03 와이어프레임 값(e5 난바 호텔)으로 채움
+    val prepaidDraft = SampleRecordForm(
+        autoFillText = null,
+        planLinkText = "숙박 · 난바 3박 (조사 600,000원)",
+        title = "난바 호텔 3박",
+        currencyText = "KRW ₩",
+        amountInputText = "540,000",
+        krwHintText = null,
+        payMethodText = "카드",
+        categoryText = "숙박",
+        paidDateText = "2026.09.02",
+        useDateText = "10/10 – 10/13",
+        payerName = "민지",
+        splitMemberNames = allMembers,
+        perPersonText = "1인 180,000원",
+        perPersonKrwText = null,
+        splitModeText = "균등 분할",
+        isSettlementExcluded = false,
+        memoText = "",
+    )
+
+    // 의도: 여행 중 새 기록 = 위치 알림에서 들어온 상황. 06 와이어프레임 값(e1 이치란 라멘)으로 채움
+    // 임시: 환산 금액은 e1 값(¥3,960 × 9.05)에 맞춤. 와이어프레임의 반올림 값(35,840원)과 다름
+    val duringTripDraft = SampleRecordForm(
+        autoFillText = "도톤보리 · 10/11(토) 12:40 · 알림에서 자동 입력",
+        planLinkText = null,
+        title = "이치란 라멘",
+        currencyText = "JPY ¥",
+        amountInputText = "3,960",
+        krwHintText = "≈ 35,838원 · 환율 9.05 (현금 지갑 환전 환율)",
+        payMethodText = "현금",
+        categoryText = "식비",
+        paidDateText = "2026.10.11",
+        useDateText = "10/11",
+        payerName = "나",
+        splitMemberNames = allMembers,
+        perPersonText = "1인 ¥1,320",
+        perPersonKrwText = "≈ 11,946원",
+        splitModeText = "균등 분할",
+        isSettlementExcluded = false,
+        memoText = "",
+    )
+
+    // 의도: 02 '결제로 전환'으로 들어오는 값. p3 주유패스 계획 항목 기준
+    private val planConvertForms = mapOf(
+        "p3" to SampleRecordForm(
+            autoFillText = null,
+            planLinkText = "교통 · 주유패스 2일 (조사 149,330원)",
+            title = "주유패스 2일",
+            currencyText = "JPY ¥",
+            amountInputText = "16,500",
+            krwHintText = "≈ 149,330원 · 환율 9.05 (수동)",
+            payMethodText = "카드",
+            categoryText = "교통",
+            paidDateText = "미정",
+            useDateText = "10/10 – 10/11",
+            payerName = "나",
+            splitMemberNames = allMembers,
+            perPersonText = "1인 ¥5,500",
+            perPersonKrwText = "≈ 49,775원",
+            splitModeText = "균등 분할",
+            isSettlementExcluded = false,
+            memoText = "",
+        ),
+    )
+
+    // 의도: 09에서 항목 눌러 들어오는 수정 모드 값. 알림 자동 입력 문구는 없음
+    private val recordForms = mapOf(
+        "e1" to duringTripDraft.copy(autoFillText = null),
+        "e2" to duringTripDraft.copy(
+            autoFillText = null,
+            title = "고베규 저녁",
+            amountInputText = "28,500",
+            krwHintText = "≈ 257,925원 · 환율 9.05",
+            payMethodText = "카드",
+            payerName = "준호",
+            perPersonText = "1인 ¥9,500",
+            perPersonKrwText = "≈ 85,975원",
+            memoText = "산노미야 역 근처",
+        ),
+        "e3" to duringTripDraft.copy(
+            autoFillText = null,
+            title = "편의점",
+            amountInputText = "860",
+            krwHintText = "≈ 7,783원 · 환율 9.05 (현금 지갑 환전 환율)",
+            categoryText = "기타",
+            paidDateText = "2026.10.12",
+            useDateText = "10/12",
+            splitMemberNames = listOf("나"),
+            perPersonText = "1인 ¥860",
+            perPersonKrwText = "≈ 7,783원",
+        ),
+        "e4" to duringTripDraft.copy(
+            autoFillText = null,
+            planLinkText = "관광 · 주유패스 (조사 150,000원)",
+            title = "주유패스",
+            amountInputText = "16,500",
+            krwHintText = "≈ 149,325원 · 환율 9.05",
+            payMethodText = "카드",
+            categoryText = "투어·입장권",
+            paidDateText = "2026.10.10",
+            useDateText = "10/10 – 10/11",
+            perPersonText = "1인 ¥5,500",
+            perPersonKrwText = "≈ 49,775원",
+        ),
+        "e5" to prepaidDraft,
+        "e6" to prepaidDraft.copy(
+            planLinkText = "항공 · 김해↔간사이 왕복 (조사 960,000원)",
+            title = "김해↔간사이 왕복",
+            amountInputText = "900,000",
+            categoryText = "항공",
+            paidDateText = "2026.08.20",
+            payerName = "나",
+            perPersonText = "1인 300,000원",
+        ),
     )
 
     fun findExpense(id: String?): SampleExpense? = expenses.firstOrNull { it.id == id }
+
+    fun findRecordForm(id: String?): SampleRecordForm? = recordForms[id]
+
+    fun findPlanItem(id: String?): SamplePlanItem? = planItems.firstOrNull { it.id == id }
+
+    // 임시: 지금은 p3(주유패스)만 전환 값이 있음. 다른 계획 항목은 카드에 버튼이 없어 호출되지 않음
+    fun findPlanConvertForm(id: String?): SampleRecordForm? = planConvertForms[id]
+
+    // 11 여행 리포트
+    val tripReportBasisTabs = listOf(
+        SampleTripReportBasis(
+            labelText = "내 기준",
+            spentLabelText = "4일 동안 쓴 돈",
+            spentAmountText = expenseListSummary.totalAmountText,
+            averageText = "하루 평균 127,030원 · 현지 지출 기준 (사전 결제 제외)",
+            budgetCompareText = "예산 ${trip.budgetPerPersonText} 대비",
+            remainingBudgetText = "211,900원 남김",
+            usedRatio = 0.82f,
+            usedPercentText = "예산의 82% 사용",
+        ),
+        SampleTripReportBasis(
+            labelText = "3명 전체",
+            spentLabelText = "4일 동안 쓴 돈",
+            spentAmountText = "2,964,300원",
+            averageText = "하루 평균 381,090원 · 현지 지출 기준 (사전 결제 제외)",
+            budgetCompareText = "예산 3,600,000원 대비",
+            remainingBudgetText = "635,700원 남김",
+            usedRatio = 0.82f,
+            usedPercentText = "예산의 82% 사용",
+        ),
+    )
+
+    // 의도: e6 항공·e2 고베규 저녁 값을 그대로 가져와 '가장 큰 지출' 카드에 씀
+    val tripReportTopSpending = listOf(
+        SampleTripReportTopSpending(
+            scopeLabel = "전체",
+            titleText = findExpense("e6")!!.title,
+            detailText = "${findExpense("e6")!!.paidDateText} 결제 · 10/10 이용",
+            amountText = findExpense("e6")!!.myBurdenAmountText,
+        ),
+        SampleTripReportTopSpending(
+            scopeLabel = "현지",
+            titleText = findExpense("e2")!!.title,
+            detailText = "10/11(토)",
+            amountText = "86,000원",
+        ),
+    )
+
+    // 의도: barRatio 합이 1.0이 되도록 맞춤 (교통+식비+숙박+쇼핑+기타 = 988,100원 = 내 기준 탭 지출액)
+    val tripReportCategoryBreakdown = listOf(
+        SampleTripReportCategoryAmount(categoryText = "교통", amountText = "340,000원", barRatio = 0.344f),
+        SampleTripReportCategoryAmount(categoryText = "식비", amountText = "270,670원", barRatio = 0.274f),
+        SampleTripReportCategoryAmount(categoryText = "숙박", amountText = "180,000원", barRatio = 0.182f),
+        SampleTripReportCategoryAmount(categoryText = "쇼핑", amountText = "137,430원", barRatio = 0.139f),
+        SampleTripReportCategoryAmount(categoryText = "기타", amountText = "60,000원", barRatio = 0.061f),
+    )
+
+    val tripReportSettlementRemainingText = "1건 남음"
+    val tripReportRemainingCashText = "¥2,300"
+
+    // 12 함께보기 초대
+    val inviteLinkText = "autotrip.app/invite/OSK-7421"
+    val inviteCodeText = "OSK-7421"
+    val inviteExpireText = "7일 뒤 만료"
+    val invitePermissionOptions = listOf("보기만", "보기 + 자기 지출 기록")
+    val inviteDefaultPermissionIndex = 1
+
+    val inviteMembers = listOf(
+        SampleInviteMember(name = "나", subtitleText = "주인장 · 편집 · 정산 확인"),
+        SampleInviteMember(name = "민지", subtitleText = "참여 중 · 보기 + 기록"),
+        SampleInviteMember(name = "준호", subtitleText = "초대 대기 · 링크를 아직 안 열었어요"),
+    )
+
+    // 의도: 실제 정산 대상(settlements)에서 준호가 보낼 항목만 모아 미리보기로 보여줌
+    val invitePreview = SampleInvitePreview(
+        memberName = "준호",
+        lines = settlements.filter { it.fromName == "준호" }.map {
+            SampleInvitePreviewLine(toName = it.toName, amountText = it.amountText)
+        },
+        actionButtonText = "보냈어요",
+        hintText = "누르면 주인장에게 '받았어요' 확인 요청이 가요",
+    )
 }

@@ -16,8 +16,6 @@ import com.example.autotrip.ui.expense.ExpenseListScreen
 import com.example.autotrip.ui.expense.ExpenseListUiState
 import com.example.autotrip.ui.expense.ExpensePlanListScreen
 import com.example.autotrip.ui.expense.ExpensePlanListUiState
-import com.example.autotrip.ui.expense.ExpensePrepaidFormScreen
-import com.example.autotrip.ui.expense.ExpensePrepaidFormUiState
 import com.example.autotrip.ui.expense.ExpenseReceiptReviewScreen
 import com.example.autotrip.ui.expense.ExpenseReceiptReviewUiState
 import com.example.autotrip.ui.expense.ExpenseRecordFormScreen
@@ -53,7 +51,7 @@ fun ExpenseFlow(onExit: () -> Unit) {
             onCashWalletClick = { navigate(ExpenseRoute.CashWallet) },
             onSettlementClick = { navigate(ExpenseRoute.Settlement) },
             onPlanListClick = { navigate(ExpenseRoute.PlanList) },
-            onPrepaidClick = { navigate(ExpenseRoute.PrepaidForm) },
+            onPrepaidClick = { navigate(ExpenseRoute.RecordForm()) },
             onExpenseListClick = { navigate(ExpenseRoute.ExpenseList) },
             onTripReportClick = { navigate(ExpenseRoute.TripReport) },
         )
@@ -61,13 +59,7 @@ fun ExpenseFlow(onExit: () -> Unit) {
         ExpenseRoute.PlanList -> ExpensePlanListScreen(
             state = ExpensePlanListUiState(),
             onBack = { pop() },
-            onConvertToPrepaidClick = { navigate(ExpenseRoute.PrepaidForm) },
-        )
-
-        ExpenseRoute.PrepaidForm -> ExpensePrepaidFormScreen(
-            state = ExpensePrepaidFormUiState(),
-            onBack = { pop() },
-            onSaveClick = { pop() },
+            onConvertToPrepaidClick = { planItemId -> navigate(ExpenseRoute.RecordForm(planItemId = planItemId)) },
         )
 
         ExpenseRoute.Settlement -> ExpenseSettlementScreen(
@@ -77,7 +69,7 @@ fun ExpenseFlow(onExit: () -> Unit) {
         )
 
         is ExpenseRoute.RecordForm -> ExpenseRecordFormScreen(
-            state = ExpenseRecordFormUiState.forExpense(current.editingExpenseId),
+            state = ExpenseRecordFormUiState.forRoute(current.editingExpenseId, current.planItemId),
             onBack = { pop() },
             onCameraClick = { navigate(ExpenseRoute.ReceiptReview) },
             onSaveClick = { pop() },

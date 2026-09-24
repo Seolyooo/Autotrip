@@ -9,9 +9,9 @@
 |---|---|---|---|---|
 | 01 | 경비 홈 | `ExpenseHomeScreen.kt` | 전체 화면 | 01-home.png |
 | 02 | 계획 금액 | `ExpensePlanListScreen.kt` | 전체 화면 | 02-plan.png |
-| 03 | 사전 결제 기록 | `ExpensePrepaidFormScreen.kt` | 전체 화면 | 03-prepaid.png |
+| 03 | (06에 합침) | — | — | 0306 지출 추가.png |
 | 04 | 정산 | `ExpenseSettlementScreen.kt` | 전체 화면 | 04-settle.png |
-| 06 | 지출 기록 | `ExpenseRecordFormScreen.kt` | 전체 화면 | 06-entry.png |
+| 06 | 지출 기록 (03 사전 결제 합침) | `ExpenseRecordFormScreen.kt` | 전체 화면 | 0306 지출 추가.png |
 | 07 | 영수증 확인 | `ExpenseReceiptReviewScreen.kt` | 전체 화면 | 07-receipt.png |
 | 08 | 현금 지갑 | `ExpenseCashWalletScreen.kt` | 전체 화면 | 08-cash.png |
 | 09 | 소비 목록 | `ExpenseListScreen.kt` | 전체 화면 | 09-list.png |
@@ -19,7 +19,7 @@
 | 11 | 여행 리포트 | `ExpenseTripReportScreen.kt` | 전체 화면 | 11-report.png |
 | 12 | 함께보기 초대 | `ExpenseInviteScreen.kt` | 전체 화면 | 12-invite.png |
 
-- 화면 파일 11개는 모두 `ui/expense/` (`com.example.autotrip.ui.expense`)
+- 화면 파일 10개(03은 06에 합침)는 모두 `ui/expense/` (`com.example.autotrip.ui.expense`)
 
 공통 파일
 
@@ -44,11 +44,10 @@
 | 01 홈 | 현금 지갑 카드 / '환전 기록' | 08 |
 | 01 홈 | 정산 카드 | 04 |
 | 01 홈 | '계획 금액' | 02 |
-| 01 홈 | '사전 결제' | 03 |
+| 01 홈 | '사전 결제' | 06 (여행 전이면 '사전 결제 기록') |
 | 01 홈 | '소비 목록' / '전체 보기' | 09 |
 | 01 홈 | 상단 리포트 아이콘 (와이어프레임에 없음, 추가) | 11 |
-| 02 계획 금액 | '결제로 전환' | 03 |
-| 03 사전 결제 | 저장 / 닫기 | 뒤로 |
+| 02 계획 금액 | '결제로 전환' | 06 |
 | 04 정산 | '동행인 함께보기 초대' | 12 |
 | 06 지출 기록 | 카메라 아이콘 | 07 |
 | 06 지출 기록 | 저장 / 닫기 | 뒤로 |
