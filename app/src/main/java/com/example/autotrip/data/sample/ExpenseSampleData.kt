@@ -62,11 +62,32 @@ data class SampleHomeSummary(
     val settlementSummaryText: String,
 )
 
+// 의도: doneBadgeText면 완료 배지, actionButtonText면 '받았어요' 같은 확인 버튼, 둘 다 없으면 waitingText만 보여줌(상대가 확인 중)
 data class SampleSettlement(
     val fromName: String,
     val toName: String,
     val amountText: String,
     val statusText: String,
+    val fromInitial: String = fromName.take(1),
+    val toInitial: String = toName.take(1),
+    val doneBadgeText: String? = null,
+    val waitingText: String? = null,
+    val actionButtonText: String? = null,
+)
+
+// 의도: 04 정산 상단 요약 카드 값
+data class SampleSettlementSummary(
+    val receivableAmountText: String,
+    val payableAmountText: String,
+    val progressRatio: Float,
+    val completionText: String,
+)
+
+// 의도: 04 정산 '근거 항목' 한 줄. 실제 지출(SampleExpense) 값에서 가져옴
+data class SampleSettlementBasisItem(
+    val titleText: String,
+    val payerAndCountText: String,
+    val perPersonAmountText: String,
 )
 
 // 의도: 07 영수증 확인 화면에 채울 인식 결과 값. OCR 없이 미리 넣어둔 샘플
@@ -121,6 +142,32 @@ data class SamplePlanItem(
     // true면 카드에 '결제로 전환' 버튼을 보여줌
     val isConvertible: Boolean = false,
     val trackingBadgeText: String? = null,
+)
+
+// 의도: 08 현금 지갑 상단 요약 카드 값. 사용/환전 비율은 계산 전이라 미리 넣어둠
+data class SampleCashWallet(
+    val currencyLabel: String,
+    val balanceAmountText: String,
+    val balanceKrwText: String,
+    val usedRatio: Float,
+    val usedAmountText: String,
+    val exchangedAmountText: String,
+    val rebalanceExampleText: String,
+    val rebalanceResultText: String,
+)
+
+data class SampleCashExchangeRecord(
+    val dateText: String,
+    val titleText: String,
+    val detailText: String,
+    val amountText: String,
+)
+
+data class SampleCashUsage(
+    val dateText: String,
+    val title: String,
+    val amountText: String,
+    val splitChipText: String? = null,
 )
 
 object ExpenseSampleData {
@@ -226,6 +273,7 @@ object ExpenseSampleData {
             isPrepaid = true,
             categoryText = "교통",
             paidDateText = "8/20",
+            myBurdenAmountText = "300,000원",
         ),
     )
 
@@ -283,9 +331,72 @@ object ExpenseSampleData {
     )
 
     val settlements = listOf(
-        SampleSettlement(fromName = "민지", toName = "나", amountText = "120,000원", statusText = "받음"),
-        SampleSettlement(fromName = "준호", toName = "나", amountText = "300,000원", statusText = "보냈어요"),
-        SampleSettlement(fromName = "준호", toName = "민지", amountText = "180,000원", statusText = "대기"),
+        SampleSettlement(
+            fromName = "민지", toName = "나", amountText = "120,000원", statusText = "받음",
+            doneBadgeText = "받음 10/02",
+        ),
+        SampleSettlement(
+            fromName = "준호", toName = "나", amountText = "300,000원", statusText = "대기",
+            waitingText = "준호: 보냈어요 10/03", actionButtonText = "받았어요",
+        ),
+        SampleSettlement(
+            fromName = "준호", toName = "민지", amountText = "180,000원", statusText = "대기",
+            waitingText = "민지가 확인해요",
+        ),
+    )
+
+    val settlementSummary = SampleSettlementSummary(
+        receivableAmountText = "420,000원",
+        payableAmountText = "0원",
+        progressRatio = 0.33f,
+        completionText = "3건 중 1건 완료",
+    )
+
+    // 의도: e6 항공권·e5 숙소를 근거 항목으로 그대로 씀 (정산 대상인 e2는 제외돼 있어 '정산 제외 1건')
+    val settlementBasisItems = listOf(
+        findExpense("e6")!!.let {
+            SampleSettlementBasisItem(
+                titleText = "${it.title} ${it.krwAmountText}",
+                payerAndCountText = "${it.payerName} 결제 · ${it.splitText}",
+                perPersonAmountText = "1인 ${it.myBurdenAmountText}",
+            )
+        },
+        findExpense("e5")!!.let {
+            SampleSettlementBasisItem(
+                titleText = "${it.title} ${it.krwAmountText}",
+                payerAndCountText = "${it.payerName} 결제 · ${it.splitText}",
+                perPersonAmountText = "1인 ${it.myBurdenAmountText}",
+            )
+        },
+    )
+    val settlementBasisExcludedCountText = "정산 제외 1건"
+
+    val cashWallet = SampleCashWallet(
+        currencyLabel = "JPY",
+        balanceAmountText = "¥31,600",
+        balanceKrwText = "≈ 285,980원 · 평균 환전 환율 9.05",
+        usedRatio = 0.37f,
+        usedAmountText = "¥18,400",
+        exchangedAmountText = "¥50,000",
+        rebalanceExampleText = "실제로 세어보니 ¥30,900",
+        rebalanceResultText = "차이 ¥700을 '기록 누락'으로 자동 추가",
+    )
+
+    val cashExchangeRecords = listOf(
+        SampleCashExchangeRecord(
+            dateText = "9/28",
+            titleText = "은행 환전",
+            detailText = "낸 돈 452,500원 ÷ 받은 돈 ¥50,000 = 9.05",
+            amountText = "+¥50,000",
+        ),
+    )
+
+    val cashUsageCountText = "12건"
+    val cashUsages = listOf(
+        SampleCashUsage(dateText = "10/11", title = "이치란 라멘", amountText = "-¥3,960", splitChipText = "N빵 3"),
+        SampleCashUsage(dateText = "10/11", title = "편의점", amountText = "-¥860"),
+        SampleCashUsage(dateText = "10/10", title = "교통카드 충전", amountText = "-¥2,000"),
+        SampleCashUsage(dateText = "10/10", title = "타코야키", amountText = "-¥1,200", splitChipText = "N빵 3"),
     )
 
     // 의도: 07 영수증 확인 와이어프레임 값(e1 이치란 라멘 기준)으로 채움

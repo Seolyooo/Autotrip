@@ -21,7 +21,7 @@
   - 06 수정 모드 (샘플 값 채움)
   - [x] 06 지출 기록 화면 채움 (03 사전 결제 합침, `0306 지출 추가.png` 기준)
   - [x] 07 영수증 확인 화면 채움
-- [ ] **U6. 08 현금 지갑 · 04 정산 · 12 초대** (`ExpenseCashWalletScreen.kt`, `ExpenseSettlementScreen.kt`, `ExpenseInviteScreen.kt`)
+- [x] **U6-08·04. 08 현금 지갑 · 04 정산** (`ExpenseCashWalletScreen.kt`, `ExpenseSettlementScreen.kt`) — 12 초대는 아직 남음
   - 04 '동행인 함께보기 초대' → 12
 - [x] **U7. 09 소비 목록 · 10 정렬·필터** (`ExpenseListScreen.kt`, `ExpenseFilterSheet.kt`)
   - 필터 아이콘/정렬 칩 → 10 바텀시트, 항목 누름 → 06 수정 모드
@@ -69,6 +69,19 @@
   - 임시: 09 상단 합계(23건·988,100원)와 날짜별 소계는 실제 있는 5건 합이 아니라 와이어프레임 값 그대로 둔 샘플. '결제 금액' 탭도 같은 금액 샘플을 그대로 씀(계산 없음)
   - 빠진 요소: 검색 아이콘(이동할 화면이 없어 보류), 주유패스 제목의 '2일' 수량 표기(기존 title 필드를 다른 화면들이 같이 써서 안 건드림)
   - 논의 필요: 09의 정렬/나누기/결제수단/결제자 칩은 전부 10 시트를 열기만 함(값으로 09에서 직접 필터링 안 함). 실제로 09에서 즉시 토글하게 할지, 10에서만 바꾸게 할지는 기능 단계에서 정할 것
+- U6-08·04 (2026-09-24): 08 현금 지갑·04 정산을 와이어프레임 배치로 채움
+  - 08: 잔액 요약 카드(금액·원화환산·사용/환전 진행바), 실제 잔액 맞추기·환전 추가 버튼, 재조정 안내 박스, 환전 내역, 현금 사용 목록(N빵 칩)
+  - 04: 받을 돈/보낼 돈 요약 카드 + 진행바, '정산 확인 안 함' 토글(화면 안 상태), 정산 카드 3종(완료 배지 / 받았어요 버튼 / 상대가 확인 중), 근거 항목(e5·e6 값 재사용), 하단 동행인 초대 버튼(기존 연결 유지)
+  - 샘플 추가: `SampleCashWallet`·`cashWallet`, `SampleCashExchangeRecord`·`cashExchangeRecords`, `SampleCashUsage`·`cashUsages`·`cashUsageCountText`, `SampleSettlementSummary`·`settlementSummary`, `SampleSettlementBasisItem`·`settlementBasisItems`·`settlementBasisExcludedCountText`, `SampleSettlement`에 `doneBadgeText`·`waitingText`·`actionButtonText`·이니셜 필드 추가, e6에 `myBurdenAmountText`("300,000원") 추가
+  - 사람 아바타는 U5와 동일하게 이니셜 AssistChip으로 대체
+  - `assembleDebug` 통과
+  - 빠진 요소: 08 상단 '+' 아이콘, 04 상단 공유 아이콘 — 둘 다 이동할 화면이 없어 보류(기존 관례와 동일)
+  - 임시: 08 '실제 잔액 맞추기'·'환전 추가' 버튼, 04 '받았어요' 버튼, '정산 확인 안 함' 토글은 자리만 두고 클릭해도 동작 없음 (계산·저장 로직은 다음 단계)
+- U6-04 다듬기 (2026-09-24): '누가 누구에게' 카드 수정 (피드백 반영)
+  - 이름 이니셜을 `AssistChip`(둥근 사각형) → `MemberInitialBadge`(고정 32dp 원형 Box) 로 교체. 완료 배지(✓ 받음)는 알약형이라 AssistChip 유지
+  - 카드 안 패딩 16dp→12dp, 줄 간격 8dp→6dp로 줄여 카드 목록 높이를 와이어프레임 비율에 가깝게 조정 (카드 간 간격은 그대로 둠)
+  - 임시: 원형 배지는 onClick 없음. 나중에 멤버 정보로 연결하면 32dp가 Material 권장 터치 영역(48dp)보다 작다는 점 다시 볼 것
+  - `assembleDebug` 통과
 - U4 (2026-09-24): 02 계획 금액을 와이어프레임 배치로 채움 (안내 문구, 계획 합계·예산 카드, 전체/미결제/결제됨 탭, 계획 항목 카드 4개 — 결제됨(체크 표시)·결제됨+절약액·미결제(결제로 전환 버튼)·현지 추적). `assembleDebug` 통과
   - 샘플 추가: `SamplePlanItem`, `ExpenseSampleData.planItems`(p1~p4)·`planStatusFilterOptions`
   - 02 '결제로 전환'(p3 주유패스)이 06에 계획 항목 연결을 채운 채 열리도록 연결: `ExpenseRoute.RecordForm`에 `planItemId` 추가, `ExpenseRecordFormUiState.forRoute(editingExpenseId, planItemId)`로 진입 경로 통합, 샘플 `planConvertForms["p3"]` 추가

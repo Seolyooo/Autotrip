@@ -1,12 +1,17 @@
 package com.example.autotrip.ui.expense
 
 import com.example.autotrip.data.sample.ExpenseSampleData
+import com.example.autotrip.data.sample.SampleCashExchangeRecord
+import com.example.autotrip.data.sample.SampleCashUsage
+import com.example.autotrip.data.sample.SampleCashWallet
 import com.example.autotrip.data.sample.SampleExpense
 import com.example.autotrip.data.sample.SampleExpenseDayGroup
 import com.example.autotrip.data.sample.SamplePlanItem
 import com.example.autotrip.data.sample.SampleReceiptScan
 import com.example.autotrip.data.sample.SampleRecordForm
 import com.example.autotrip.data.sample.SampleSettlement
+import com.example.autotrip.data.sample.SampleSettlementBasisItem
+import com.example.autotrip.data.sample.SampleSettlementSummary
 
 // 의도: 화면별 UiState. 기본값은 샘플 데이터로 채움
 // TODO: 화면 채우는 단계(U3~)에서 필요한 필드 추가할 것
@@ -38,7 +43,11 @@ data class ExpensePlanListUiState(
 )
 
 data class ExpenseSettlementUiState(
+    val tripTitle: String = ExpenseSampleData.trip.title,
+    val summary: SampleSettlementSummary = ExpenseSampleData.settlementSummary,
     val settlements: List<SampleSettlement> = ExpenseSampleData.settlements,
+    val basisItems: List<SampleSettlementBasisItem> = ExpenseSampleData.settlementBasisItems,
+    val basisExcludedCountText: String = ExpenseSampleData.settlementBasisExcludedCountText,
 )
 
 // 의도: 03 사전 결제 + 06 지출 기록을 합친 화면. 여행 전이면 사전 결제, 첫날부터는 지출 기록으로 보임
@@ -99,7 +108,10 @@ data class ExpenseReceiptReviewUiState(
 )
 
 data class ExpenseCashWalletUiState(
-    val exchangeRateText: String = ExpenseSampleData.trip.exchangeRateText,
+    val wallet: SampleCashWallet = ExpenseSampleData.cashWallet,
+    val exchangeRecords: List<SampleCashExchangeRecord> = ExpenseSampleData.cashExchangeRecords,
+    val usageCountText: String = ExpenseSampleData.cashUsageCountText,
+    val usages: List<SampleCashUsage> = ExpenseSampleData.cashUsages,
 )
 
 data class ExpenseListUiState(
