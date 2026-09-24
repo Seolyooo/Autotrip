@@ -11,8 +11,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -105,10 +108,12 @@ fun ExpenseRecordFormScreen(
             )
         },
         bottomBar = {
+            // 의도: 시스템 내비게이션 바에 버튼이 가려지지 않게 navigationBarsPadding 적용
             Button(
                 onClick = onSaveClick,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .navigationBarsPadding()
                     .padding(16.dp),
             ) { Text("저장") }
         },
@@ -121,22 +126,23 @@ fun ExpenseRecordFormScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // 계획 항목 연결: 위치 알림으로 들어왔으면 알림 문구, 아니면 계획 항목 선택
-            FormSection(label = "계획 항목 연결") {
-                val autoFillText = form.autoFillText
-                if (autoFillText != null) {
-                    // 논의 필요: 알림 문구 칸을 눌러 계획 항목 선택으로 바꿀 수 있게 할지 정할 것
-                    OutlinedCard(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Icon(Icons.Filled.LocationOn, contentDescription = null)
-                            Text(autoFillText, style = MaterialTheme.typography.bodyMedium)
-                        }
+            // 계획 항목 연결: 위치 알림으로 들어왔으면 알림 문구(라벨 없이), 아니면 라벨 + 계획 항목 선택
+            // 의도: 06(알림) 이미지는 라벨 없이 알림 박스만, 03(직접 선택) 이미지는 '계획 항목 연결' 라벨이 붙어 있어 그대로 따름
+            val autoFillText = form.autoFillText
+            if (autoFillText != null) {
+                // 논의 필요: 알림 문구 칸을 눌러 계획 항목 선택으로 바꿀 수 있게 할지 정할 것
+                OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Icon(Icons.Filled.LocationOn, contentDescription = null)
+                        Text(autoFillText, style = MaterialTheme.typography.bodyMedium)
                     }
-                } else {
+                }
+            } else {
+                FormSection(label = "계획 항목 연결") {
                     Box {
                         OutlinedCard(
                             onClick = { planMenuOpen = true },
@@ -185,6 +191,7 @@ fun ExpenseRecordFormScreen(
                     value = titleInput,
                     onValueChange = { titleInput = it },
                     singleLine = true,
+                    shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -199,8 +206,9 @@ fun ExpenseRecordFormScreen(
                     AssistChip(
                         onClick = { currencyMenuOpen = true },
                         label = { Text(currency) },
+                        shape = CircleShape,
                         trailingIcon = {
-                            Icon(
+                             Icon(
                                 Icons.Filled.ArrowDropDown,
                                 contentDescription = "통화 선택",
                                 modifier = Modifier.size(18.dp),
@@ -222,13 +230,14 @@ fun ExpenseRecordFormScreen(
                         }
                     }
                 }
+                // 의도: 이미지처럼 화면 폭 전체가 아니라 입력 글자 폭 정도로만 좁게 둠
                 TextField(
                     value = amountInput,
                     onValueChange = { amountInput = it },
                     textStyle = MaterialTheme.typography.displayMedium.copy(textAlign = TextAlign.Center),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 220.dp),
                 )
                 // 임시: 금액·통화를 바꿔도 환산 문구는 샘플 그대로. 원화 결제면 샘플에 문구 없음
                 form.krwHintText?.let { krwHintText ->
@@ -265,12 +274,14 @@ fun ExpenseRecordFormScreen(
                             selected = category == option,
                             onClick = { category = option },
                             label = { Text(option) },
+                            shape = CircleShape,
                         )
                     }
                     if (state.categoryOptions.size > COLLAPSED_CATEGORY_COUNT) {
                         AssistChip(
                             onClick = { categoriesExpanded = !categoriesExpanded },
                             label = { Text(if (categoriesExpanded) "접기" else "…") },
+                            shape = CircleShape,
                         )
                     }
                 }
@@ -285,6 +296,7 @@ fun ExpenseRecordFormScreen(
                         onValueChange = {},
                         readOnly = true,
                         singleLine = true,
+                        shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -294,6 +306,7 @@ fun ExpenseRecordFormScreen(
                         onValueChange = {},
                         readOnly = true,
                         singleLine = true,
+                        shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -307,6 +320,7 @@ fun ExpenseRecordFormScreen(
                             selected = payerName == name,
                             onClick = { payerName = name },
                             label = { Text(name) },
+                            shape = CircleShape,
                         )
                     }
                 }
@@ -330,6 +344,7 @@ fun ExpenseRecordFormScreen(
                                     splitMembers = if (selected) splitMembers - name else splitMembers + name
                                 },
                                 label = { Text(name) },
+                                shape = CircleShape,
                                 leadingIcon = if (selected) {
                                     {
                                         Icon(
@@ -372,6 +387,7 @@ fun ExpenseRecordFormScreen(
                             label = { Text(name) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            shape = MaterialTheme.shapes.medium,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -396,6 +412,7 @@ fun ExpenseRecordFormScreen(
                     value = memoInput,
                     onValueChange = { memoInput = it },
                     placeholder = { Text("선택 입력") },
+                    shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

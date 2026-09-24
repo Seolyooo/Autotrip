@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -81,7 +82,9 @@ fun ExpenseHomeScreen(
             )
         },
         floatingActionButton = {
+            // 의도: 시스템 내비게이션 바에 FAB이 가려지지 않게 navigationBarsPadding 적용
             Row(
+                modifier = Modifier.navigationBarsPadding(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
