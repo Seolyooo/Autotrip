@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
     implementation("androidx.navigation:navigation-compose:2.9.7")
+    implementation("com.kizitonwose.calendar:compose:2.10.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     testImplementation(libs.junit)
