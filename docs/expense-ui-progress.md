@@ -16,14 +16,14 @@
   - 홈에서 나가는 이동 콜백 전부 (06, 07, 08, 04, 02, 03, 09, 11)
 - [ ] **U4. 02 계획 금액** (`ExpensePlanListScreen.kt`) — 03 사전 결제는 06에 합침 (U5)
   - 02 '결제로 전환' → 06 (계획 항목 연결 채워서)
-- [ ] **U5. 06 지출 기록 · 07 영수증 확인** (`ExpenseRecordFormScreen.kt`, `ExpenseReceiptReviewScreen.kt`)
+- [x] **U5. 06 지출 기록 · 07 영수증 확인** (`ExpenseRecordFormScreen.kt`, `ExpenseReceiptReviewScreen.kt`)
   - 06 카메라 → 07, 07 '확인하고 저장' → 뒤로 (06 거쳐 왔으면 06도 닫기)
   - 06 수정 모드 (샘플 값 채움)
   - [x] 06 지출 기록 화면 채움 (03 사전 결제 합침, `0306 지출 추가.png` 기준)
-  - [ ] 07 영수증 확인 화면 채움
+  - [x] 07 영수증 확인 화면 채움
 - [ ] **U6. 08 현금 지갑 · 04 정산 · 12 초대** (`ExpenseCashWalletScreen.kt`, `ExpenseSettlementScreen.kt`, `ExpenseInviteScreen.kt`)
   - 04 '동행인 함께보기 초대' → 12
-- [ ] **U7. 09 소비 목록 · 10 정렬·필터** (`ExpenseListScreen.kt`, `ExpenseFilterSheet.kt`)
+- [x] **U7. 09 소비 목록 · 10 정렬·필터** (`ExpenseListScreen.kt`, `ExpenseFilterSheet.kt`)
   - 필터 아이콘/정렬 칩 → 10 바텀시트, 항목 누름 → 06 수정 모드
 - [ ] **U8. 11 여행 리포트 + 전체 점검** (`ExpenseTripReportScreen.kt`)
   - 11 정산 카드 → 04, 공유 → 12
@@ -55,3 +55,17 @@
   - 카테고리 8개(식비·교통·항공·숙박·관광·투어·입장권·쇼핑·기타), 처음엔 5개 + '…', 누르면 전부 펼침. 선택된 건 접혀도 보임
   - 샘플: `prepaidDraft`(e5 값), `duringTripDraft`(e1 값), e1~e6 수정 모드 폼, `planLinkOptions`, `splitModeOptions`
   - 임시: 결제일·이용일은 읽기 전용(TODO: DatePicker), 직접 입력 금액 칸은 빈 칸에서 시작
+- U5-07 (2026-09-24): 07 영수증 확인을 와이어프레임 배치로 채움 (영수증 자리 회색 박스, 인식 결과 - 금액·날짜·결제수단(판단 근거)·가게 + 확인 체크, 카테고리 카드(미분류·확인 필요 → 칩 고르면 해제), 나눌 사람 요약 + 변경 시 멤버 칩 펼침, 하단 다시 찍기·확인하고 저장). `assembleDebug` 통과
+  - 샘플 추가: `SampleReceiptScan`, `receiptScan`(e1 이치란 라멘 값 기준: ¥3,960, 2026.10.11 12:38, 현금, 一蘭 道頓堀店, 추천 카테고리 식비)
+  - 카테고리 선택지는 06의 8개 전체가 아니라 07 전용 4개(식비·쇼핑·관광·기타)로 새로 둠. 추천 항목에 '(추천)' 표시
+  - '다시 찍기'는 이동할 화면이 없어 onBack 재사용 (뒤로와 동일 동작)
+  - 임시: 카테고리·나눌 사람을 바꿔도 저장 값은 그대로 버림 (계산·저장은 기능 단계)
+  - 빠진 요소: 없음. 확인 체크·경고 아이콘은 Material 기본 Check/Warning 아이콘으로, 인식 결과 구분선은 실선(점선 대신)으로 대체
+- U7 (2026-09-24): 09 소비 목록·10 정렬·필터를 와이어프레임 배치로 채움
+  - 09: 여행 이름 드롭다운(자리만), 내 부담액/결제 금액 세그먼트 탭, 정렬·나누기·결제수단·결제자 칩 행(전부 onFilterClick), 합계 카드, 날짜별 묶음(그룹 헤더 + 항목 카드: 제목·시간, 금액 2~3줄, 결제수단·N빵·결제자·정산상태 칩)
+  - 10: 정렬/날짜(읽기 전용 + 기준)/여행/나누기/결제한 사람/결제 수단/정산 상태 전부 FilterChip 단일 선택, 초기화 버튼은 진입 시 값으로 되돌림, 'N건 보기'는 샘플 문구 그대로
+  - 샘플 추가: `SampleExpense`에 `timeText`·`myBurdenAmountText`·`myBurdenKrwText`·`totalAmountText`·`splitChipText`·`payerChipText`·`settlementChipText` 필드, `SampleExpenseDayGroup`·`SampleExpenseListSummary`, 09/10 공통 옵션 목록(`sortOptions`·`splitFilterOptions`·`payMethodFilterOptions`·`settlementFilterOptions`·`dateBasisOptions`·`tripFilterOptions`·`payerFilterOptions`)과 기본값
+  - e1~e5에 카테고리·시간·내 부담액·칩 값 채움(e6은 여행 전 항공권이라 09 목록 묶음에서 뺌, 기존대로 홈 최근기록에서만 씀)
+  - 임시: 09 상단 합계(23건·988,100원)와 날짜별 소계는 실제 있는 5건 합이 아니라 와이어프레임 값 그대로 둔 샘플. '결제 금액' 탭도 같은 금액 샘플을 그대로 씀(계산 없음)
+  - 빠진 요소: 검색 아이콘(이동할 화면이 없어 보류), 주유패스 제목의 '2일' 수량 표기(기존 title 필드를 다른 화면들이 같이 써서 안 건드림)
+  - 논의 필요: 09의 정렬/나누기/결제수단/결제자 칩은 전부 10 시트를 열기만 함(값으로 09에서 직접 필터링 안 함). 실제로 09에서 즉시 토글하게 할지, 10에서만 바꾸게 할지는 기능 단계에서 정할 것

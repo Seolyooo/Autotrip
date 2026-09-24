@@ -25,6 +25,27 @@ data class SampleExpense(
     val isPrepaid: Boolean = false,
     val categoryText: String = "",
     val paidDateText: String = "",
+    // 09 소비 목록 전용: amountText·krwAmountText는 전체 금액, 아래는 '내 부담액' 탭 표시 값
+    val timeText: String = "",
+    val myBurdenAmountText: String = amountText,
+    val myBurdenKrwText: String? = null,
+    val totalAmountText: String? = null,
+    val splitChipText: String? = null,
+    val payerChipText: String? = null,
+    val settlementChipText: String? = null,
+)
+
+// 의도: 09 소비 목록의 날짜 묶음 하나. 부담 합계는 계산하지 않고 문자열로 미리 넣어둠
+data class SampleExpenseDayGroup(
+    val dateLabel: String,
+    val myBurdenSubtotalText: String,
+    val expenses: List<SampleExpense>,
+)
+
+// 의도: 09 상단 합계 카드 값
+data class SampleExpenseListSummary(
+    val totalCountText: String,
+    val totalAmountText: String,
 )
 
 // 의도: 01 경비 홈 카드에 보이는 요약 값. 합계·비율은 계산 전이라 미리 넣어둠
@@ -46,6 +67,21 @@ data class SampleSettlement(
     val toName: String,
     val amountText: String,
     val statusText: String,
+)
+
+// 의도: 07 영수증 확인 화면에 채울 인식 결과 값. OCR 없이 미리 넣어둔 샘플
+data class SampleReceiptScan(
+    val photoPlaceholderText: String,
+    val amountText: String,
+    val dateTimeText: String,
+    val payMethodText: String,
+    val payMethodReasonText: String,
+    val storeText: String,
+    val categoryDefaultText: String,
+    val recommendedCategory: String,
+    val categoryOptions: List<String>,
+    val categoryHintText: String,
+    val splitSummaryText: String,
 )
 
 // 의도: 03+06 지출 기록 폼에 채워 넣을 값. 환산·1인 금액은 계산 전이라 문자열로 미리 넣어둠
@@ -91,6 +127,13 @@ object ExpenseSampleData {
             payMethodText = "현금",
             splitText = "3명",
             payerName = "나",
+            categoryText = "식비",
+            timeText = "12:40",
+            myBurdenAmountText = "¥1,320",
+            myBurdenKrwText = "≈ 11,950원",
+            totalAmountText = "전체 ¥3,960",
+            splitChipText = "N빵 3",
+            payerChipText = "나 결제",
         ),
         SampleExpense(
             id = "e2",
@@ -100,6 +143,14 @@ object ExpenseSampleData {
             payMethodText = "카드",
             splitText = "3명",
             payerName = "준호",
+            categoryText = "식비",
+            timeText = "19:10",
+            myBurdenAmountText = "¥9,500",
+            myBurdenKrwText = "≈ 86,000원",
+            totalAmountText = "전체 ¥28,500",
+            splitChipText = "N빵 3",
+            payerChipText = "준호 결제",
+            settlementChipText = "정산 대기",
         ),
         SampleExpense(
             id = "e3",
@@ -109,6 +160,11 @@ object ExpenseSampleData {
             payMethodText = "현금",
             splitText = "개인",
             payerName = "나",
+            categoryText = "쇼핑",
+            timeText = "15:02",
+            myBurdenAmountText = "¥860",
+            myBurdenKrwText = "≈ 7,780원",
+            splitChipText = "개인",
         ),
         SampleExpense(
             id = "e4",
@@ -118,6 +174,13 @@ object ExpenseSampleData {
             payMethodText = "카드",
             splitText = "3명",
             payerName = "나",
+            categoryText = "교통",
+            timeText = "10:15",
+            myBurdenAmountText = "¥5,500",
+            myBurdenKrwText = "≈ 49,780원",
+            totalAmountText = "전체 ¥16,500",
+            splitChipText = "N빵 3",
+            payerChipText = "나 결제",
         ),
         SampleExpense(
             id = "e5",
@@ -130,6 +193,10 @@ object ExpenseSampleData {
             isPrepaid = true,
             categoryText = "숙박",
             paidDateText = "9/02",
+            timeText = "이용일",
+            myBurdenAmountText = "180,000원",
+            totalAmountText = "전체 540,000원",
+            payerChipText = "민지 결제",
         ),
         SampleExpense(
             id = "e6",
@@ -147,6 +214,42 @@ object ExpenseSampleData {
 
     // 임시: 여행 전(D-17) 기준이라 최근 기록은 사전 결제 두 건만 둠. 정렬 기준은 기능 단계에서 정할 것
     val recentExpenses = listOf("e5", "e6").mapNotNull { findExpense(it) }
+
+    // 09 소비 목록: 날짜별 묶음(최신순 · 이용일 기준). e6은 여행 전 항공권이라 목록에서 뺌
+    val expenseDayGroups = listOf(
+        SampleExpenseDayGroup(
+            dateLabel = "10/11 (토)",
+            myBurdenSubtotalText = "내 부담 105,730원",
+            expenses = listOf("e2", "e3", "e1").mapNotNull { findExpense(it) },
+        ),
+        SampleExpenseDayGroup(
+            dateLabel = "10/10 (금)",
+            myBurdenSubtotalText = "내 부담 229,780원",
+            expenses = listOf("e4", "e5").mapNotNull { findExpense(it) },
+        ),
+    )
+
+    // 임시: 위 두 날짜 묶음(5건)만 실제로 있고, 합계는 와이어프레임 값(23건)을 그대로 넣어둠
+    val expenseListSummary = SampleExpenseListSummary(
+        totalCountText = "23건",
+        totalAmountText = "988,100원",
+    )
+
+    // 09/10 공통: 정렬·필터 옵션과 기본 선택값
+    val sortOptions = listOf("최신순", "과거순", "금액 큰 순", "금액 작은 순")
+    val splitFilterOptions = listOf("전체", "N빵만", "개인만")
+    val payMethodFilterOptions = listOf("전체", "현금", "카드")
+    val settlementFilterOptions = listOf("전체", "미정산만")
+    val dateBasisOptions = listOf("이용일 기준", "결제일 기준")
+    val tripFilterOptions = listOf(trip.title, "전체 여행")
+    val payerFilterOptions = listOf("전체") + trip.memberNames
+
+    val defaultSortOption = sortOptions.first()
+    val defaultSplitFilter = "N빵만"
+    val defaultDateFromText = "2026.10.10"
+    val defaultDateToText = "2026.10.13"
+    // 임시: '14건 보기'는 위 필터 기본값에 맞춘 샘플 문구. 선택을 바꿔도 계산하지 않음 (기능 단계에서 처리)
+    val filterResultCountText = "14건 보기"
 
     // 의도: 사전 결제 480,000원 = 호텔·항공 3명 분할 중 내 몫(180,000 + 300,000)으로 맞춤
     val homeSummary = SampleHomeSummary(
@@ -166,6 +269,21 @@ object ExpenseSampleData {
         SampleSettlement(fromName = "민지", toName = "나", amountText = "120,000원", statusText = "받음"),
         SampleSettlement(fromName = "준호", toName = "나", amountText = "300,000원", statusText = "보냈어요"),
         SampleSettlement(fromName = "준호", toName = "민지", amountText = "180,000원", statusText = "대기"),
+    )
+
+    // 의도: 07 영수증 확인 와이어프레임 값(e1 이치란 라멘 기준)으로 채움
+    val receiptScan = SampleReceiptScan(
+        photoPlaceholderText = "촬영한 영수증",
+        amountText = "¥3,960",
+        dateTimeText = "2026.10.11 12:38",
+        payMethodText = "현금",
+        payMethodReasonText = "영수증의 '現金' 표기로 판단",
+        storeText = "一蘭 道頓堀店",
+        categoryDefaultText = "미분류",
+        recommendedCategory = "식비",
+        categoryOptions = listOf("식비", "쇼핑", "관광", "기타"),
+        categoryHintText = "가게 이름으로 추천해요. 하나 고르면 끝.",
+        splitSummaryText = "최근 설정 · 3명 균등",
     )
 
     // 지출 기록(03+06) 선택지

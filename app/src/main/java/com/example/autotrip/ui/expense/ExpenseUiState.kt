@@ -2,6 +2,8 @@ package com.example.autotrip.ui.expense
 
 import com.example.autotrip.data.sample.ExpenseSampleData
 import com.example.autotrip.data.sample.SampleExpense
+import com.example.autotrip.data.sample.SampleExpenseDayGroup
+import com.example.autotrip.data.sample.SampleReceiptScan
 import com.example.autotrip.data.sample.SampleRecordForm
 import com.example.autotrip.data.sample.SampleSettlement
 
@@ -74,6 +76,7 @@ data class ExpenseRecordFormUiState(
 
 data class ExpenseReceiptReviewUiState(
     val memberNames: List<String> = ExpenseSampleData.trip.memberNames,
+    val scan: SampleReceiptScan = ExpenseSampleData.receiptScan,
 )
 
 data class ExpenseCashWalletUiState(
@@ -81,11 +84,35 @@ data class ExpenseCashWalletUiState(
 )
 
 data class ExpenseListUiState(
-    val expenses: List<SampleExpense> = ExpenseSampleData.expenses,
+    val tripTitle: String = ExpenseSampleData.trip.title,
+    val totalCountText: String = ExpenseSampleData.expenseListSummary.totalCountText,
+    val totalAmountText: String = ExpenseSampleData.expenseListSummary.totalAmountText,
+    val dayGroups: List<SampleExpenseDayGroup> = ExpenseSampleData.expenseDayGroups,
+    // 의도: 아래 값은 09 상단 정렬·필터 칩에 현재 상태를 보여주기만 함. 칩을 누르면 값과 상관없이 10번 시트를 염
+    val sortLabelText: String = ExpenseSampleData.defaultSortOption,
+    val isSplitOnlyActive: Boolean = ExpenseSampleData.defaultSplitFilter == "N빵만",
+    val payMethodQuickOptions: List<String> = ExpenseSampleData.payMethodFilterOptions.drop(1),
+    val payerLabelText: String = "결제자",
 )
 
 data class ExpenseFilterUiState(
-    val memberNames: List<String> = ExpenseSampleData.trip.memberNames,
+    val sortOptions: List<String> = ExpenseSampleData.sortOptions,
+    val selectedSort: String = ExpenseSampleData.defaultSortOption,
+    val dateFromText: String = ExpenseSampleData.defaultDateFromText,
+    val dateToText: String = ExpenseSampleData.defaultDateToText,
+    val dateBasisOptions: List<String> = ExpenseSampleData.dateBasisOptions,
+    val selectedDateBasis: String = ExpenseSampleData.dateBasisOptions.first(),
+    val tripOptions: List<String> = ExpenseSampleData.tripFilterOptions,
+    val selectedTrip: String = ExpenseSampleData.trip.title,
+    val splitOptions: List<String> = ExpenseSampleData.splitFilterOptions,
+    val selectedSplit: String = ExpenseSampleData.defaultSplitFilter,
+    val payerOptions: List<String> = ExpenseSampleData.payerFilterOptions,
+    val selectedPayer: String = ExpenseSampleData.payerFilterOptions.first(),
+    val payMethodOptions: List<String> = ExpenseSampleData.payMethodFilterOptions,
+    val selectedPayMethod: String = ExpenseSampleData.payMethodFilterOptions.first(),
+    val settlementOptions: List<String> = ExpenseSampleData.settlementFilterOptions,
+    val selectedSettlement: String = ExpenseSampleData.settlementFilterOptions.first(),
+    val resultCountButtonText: String = ExpenseSampleData.filterResultCountText,
 )
 
 data class ExpenseTripReportUiState(
