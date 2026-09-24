@@ -9,18 +9,16 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.autotrip.ui.common.BackTopBar
 import com.example.autotrip.ui.plan.components.BudgetStep
 import com.example.autotrip.ui.plan.components.CollapsibleSummary
 import com.example.autotrip.ui.plan.components.DatesStep
@@ -89,104 +88,99 @@ fun TripCreateScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .imePadding()
-            .padding(horizontal = 24.dp, vertical = 8.dp)
-    ) {
-
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(
-                onClick = {
-                    goBack()
-                }
-            ) {
-                Text(
-                    text = "←",
-                    fontSize = 28.sp
-                )
-            }
+    Scaffold(
+        topBar = {
+            BackTopBar(
+                title = "여행 만들기",
+                onBackClick = { goBack() }
+            )
         }
+    ) { innerPadding ->
 
         Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .fillMaxSize()
+                .imePadding()
+                .padding(horizontal = 24.dp, vertical = 8.dp)
         ) {
 
-            AccordionBody(
-                step = step,
-                destination = destination,
-                startDateMillis = startDateMillis,
-                endDateMillis = endDateMillis,
-                budget = budget,
-                selectedStyles = selectedStyles,
-
-                onDestinationChange = {
-                    destination = it
-                },
-
-                onDestinationConfirm = {
-                    if (destination.isBlank()) return@AccordionBody
-                    step = TripCreateStep.Dates
-                },
-
-                onDatesConfirm = { start, end ->
-                    startDateMillis = start
-                    endDateMillis = end
-                    step = TripCreateStep.Budget
-                },
-
-                onBudgetChange = {
-                    budget = it.filter(Char::isDigit)
-                },
-
-                onBudgetConfirm = {
-                    if (budget.isBlank()) return@AccordionBody
-                    step = TripCreateStep.Style
-                },
-
-                onStyleToggle = { style ->
-                    selectedStyles =
-                        if (style in selectedStyles) {
-                            selectedStyles - style
-                        } else {
-                            selectedStyles + style
-                        }
-                },
-
-                onEditStep = {
-                    step = it
-                }
-            )
-        }
-
-        AnimatedVisibility(
-            visible = canCreate,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-
-            Button(
-                onClick = onCreateClick,
+            Column(
                 modifier = Modifier
+                    .weight(1f)
                     .fillMaxWidth()
-                    .padding(
-                        top = 12.dp,
-                        bottom = 8.dp
-                    )
-                    .height(56.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    text = "일정 생성하기",
-                    fontSize = 18.sp
+
+                AccordionBody(
+                    step = step,
+                    destination = destination,
+                    startDateMillis = startDateMillis,
+                    endDateMillis = endDateMillis,
+                    budget = budget,
+                    selectedStyles = selectedStyles,
+
+                    onDestinationChange = {
+                        destination = it
+                    },
+
+                    onDestinationConfirm = {
+                        if (destination.isBlank()) return@AccordionBody
+                        step = TripCreateStep.Dates
+                    },
+
+                    onDatesConfirm = { start, end ->
+                        startDateMillis = start
+                        endDateMillis = end
+                        step = TripCreateStep.Budget
+                    },
+
+                    onBudgetChange = {
+                        budget = it.filter(Char::isDigit)
+                    },
+
+                    onBudgetConfirm = {
+                        if (budget.isBlank()) return@AccordionBody
+                        step = TripCreateStep.Style
+                    },
+
+                    onStyleToggle = { style ->
+                        selectedStyles =
+                            if (style in selectedStyles) {
+                                selectedStyles - style
+                            } else {
+                                selectedStyles + style
+                            }
+                    },
+
+                    onEditStep = {
+                        step = it
+                    }
                 )
+            }
+
+            AnimatedVisibility(
+                visible = canCreate,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+
+                Button(
+                    onClick = onCreateClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = 12.dp,
+                            bottom = 8.dp
+                        )
+                        .height(56.dp)
+                ) {
+                    Text(
+                        text = "일정 생성하기",
+                        fontSize = 18.sp
+                    )
+                }
             }
         }
     }

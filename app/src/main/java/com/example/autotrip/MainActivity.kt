@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -14,11 +15,13 @@ import com.example.autotrip.ui.auth.SplashScreen
 import com.example.autotrip.ui.budget.BudgetDetailScreen
 import com.example.autotrip.ui.budget.BudgetMainScreen
 import com.example.autotrip.ui.budget.ExpenseEntryScreen
+import com.example.autotrip.ui.diary.TripLogDetailScreen
 import com.example.autotrip.ui.home.HomeScreen
 import com.example.autotrip.ui.plan.PlanScreen
 import com.example.autotrip.ui.plan.RecommendLoadingScreen
 import com.example.autotrip.ui.plan.RecommendResultScreen
 import com.example.autotrip.ui.plan.TripCreateScreen
+import com.example.autotrip.ui.plan.TripInviteScreen
 import com.example.autotrip.ui.theme.AutoTripTheme
 import kotlinx.coroutines.delay
 
@@ -38,6 +41,10 @@ class MainActivity : ComponentActivity() {
                 var showTripCreate by remember { mutableStateOf(false) }
                 var showRecommendLoading by remember { mutableStateOf(false) }
                 var showRecommendResult by remember { mutableStateOf(false) }
+                var showTripInvite by remember { mutableStateOf(false) }
+                var showTripLog by remember { mutableStateOf(false) }
+                var tripLogTitle by remember { mutableStateOf("") }
+                var homeTabIndex by remember { mutableIntStateOf(0) }
                 var showBudget by remember { mutableStateOf(false) }
                 var showBudgetDetail by remember { mutableStateOf(false) }
                 var showExpense by remember { mutableStateOf(false) }
@@ -55,6 +62,20 @@ class MainActivity : ComponentActivity() {
                         SplashScreen()
                     }
 
+                    // 친구 초대
+                    showTripInvite -> {
+                        TripInviteScreen(
+                            onBackClick = {
+                                showTripInvite = false
+                                showRecommendResult = true
+                            },
+                            onNextClick = {
+                                showTripInvite = false
+                                showHome = true
+                            }
+                        )
+                    }
+
                     // 추천 결과
                     showRecommendResult -> {
                         RecommendResultScreen(
@@ -64,6 +85,10 @@ class MainActivity : ComponentActivity() {
                             onRegenerateClick = {
                                 showRecommendResult = false
                                 showRecommendLoading = true
+                            },
+                            onConfirmClick = {
+                                showRecommendResult = false
+                                showTripInvite = true
                             }
                         )
                     }
@@ -142,9 +167,25 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+                    // 여행 로그 상세
+                    showTripLog -> {
+                        TripLogDetailScreen(
+                            tripTitle = tripLogTitle,
+                            onBackClick = {
+                                showTripLog = false
+                            }
+                        )
+                    }
+
                     // 5. 메인
                     showHome -> {
                         HomeScreen(
+                            selectedTabIndex = homeTabIndex,
+                            onTabChange = { homeTabIndex = it },
+                            onLogClick = { title ->
+                                tripLogTitle = title
+                                showTripLog = true
+                            },
                             onTravelClick = {
                                 showHome = true
                                 showPlan = true
