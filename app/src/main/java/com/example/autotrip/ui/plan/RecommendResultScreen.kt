@@ -18,10 +18,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,8 +28,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -48,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.autotrip.ui.common.BackTopBar
 import java.time.LocalDate
 
 private data class ScheduleItem(
@@ -112,7 +112,8 @@ private fun nextAlternative(current: String): String {
 @Composable
 fun RecommendResultScreen(
     onBackClick: () -> Unit = {},
-    onRegenerateClick: () -> Unit = {}
+    onRegenerateClick: () -> Unit = {},
+    onConfirmClick: () -> Unit = {}
 ) {
     var dayPlans by remember { mutableStateOf(sampleDayPlans()) }
     var dayIndex by remember { mutableStateOf(0) }
@@ -133,83 +134,98 @@ fun RecommendResultScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .padding(horizontal = 24.dp, vertical = 8.dp)
-    ) {
-
-        IconButton(onClick = onBackClick) {
-            Text(
-                text = "←",
-                fontSize = 28.sp
+    Scaffold(
+        topBar = {
+            BackTopBar(
+                title = "추천 일정",
+                onBackClick = onBackClick
             )
         }
+    ) { innerPadding ->
 
-        DateNavigator(
-            date = dayPlans[dayIndex].date,
-            canGoPrevious = dayIndex > 0,
-            canGoNext = dayIndex < dayPlans.lastIndex,
-            onPreviousClick = { dayIndex-- },
-            onNextClick = { dayIndex++ }
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        AnimatedContent(
-            targetState = dayIndex,
-            transitionSpec = {
-                fadeIn() togetherWith fadeOut()
-            },
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            label = "dayPlan"
-        ) { index ->
-            DayTimelineCard(
-                dayNumber = index + 1,
-                items = dayPlans[index].items,
-                onReplaceClick = { itemIndex ->
-                    updateItems(index) { items ->
-                        items.mapIndexed { i, item ->
-                            if (i == itemIndex) {
-                                item.copy(title = nextAlternative(item.title))
-                            } else {
-                                item
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 8.dp)
+        ) {
+
+            DateNavigator(
+                date = dayPlans[dayIndex].date,
+                canGoPrevious = dayIndex > 0,
+                canGoNext = dayIndex < dayPlans.lastIndex,
+                onPreviousClick = { dayIndex-- },
+                onNextClick = { dayIndex++ }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            AnimatedContent(
+                targetState = dayIndex,
+                transitionSpec = {
+                    fadeIn() togetherWith fadeOut()
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                label = "dayPlan"
+            ) { index ->
+                DayTimelineCard(
+                    dayNumber = index + 1,
+                    items = dayPlans[index].items,
+                    onReplaceClick = { itemIndex ->
+                        updateItems(index) { items ->
+                            items.mapIndexed { i, item ->
+                                if (i == itemIndex) {
+                                    item.copy(title = nextAlternative(item.title))
+                                } else {
+                                    item
+                                }
                             }
                         }
+                    },
+                    onDeleteClick = { itemIndex ->
+                        updateItems(index) { items ->
+                            items.filterIndexed { i, _ -> i != itemIndex }
+                        }
+                    }
+                )
+            }
+
+            OutlinedButton(
+                onClick = {
+                    if (isEdited) {
+                        showRegenerateDialog = true
+                    } else {
+                        onRegenerateClick()
                     }
                 },
-                onDeleteClick = { itemIndex ->
-                    updateItems(index) { items ->
-                        items.filterIndexed { i, _ -> i != itemIndex }
-                    }
-                }
-            )
-        }
-
-        Button(
-            onClick = {
-                if (isEdited) {
-                    showRegenerateDialog = true
-                } else {
-                    onRegenerateClick()
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = 12.dp,
-                    bottom = 8.dp
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+                    .height(56.dp)
+            ) {
+                Text(
+                    text = "다시 생성하기",
+                    fontSize = 18.sp
                 )
-                .height(56.dp)
-        ) {
-            Text(
-                text = "다시 생성하기",
-                fontSize = 18.sp
-            )
+            }
+
+            Button(
+                onClick = onConfirmClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = 8.dp,
+                        bottom = 8.dp
+                    )
+                    .height(56.dp)
+            ) {
+                Text(
+                    text = "일정 확정하기",
+                    fontSize = 18.sp
+                )
+            }
         }
     }
 
