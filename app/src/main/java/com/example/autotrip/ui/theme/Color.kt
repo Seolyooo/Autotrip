@@ -9,3 +9,10 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+// 가계부 카테고리별 색상. 카테고리 늘어나면 여기에 색만 추가하면 되게 해둠
+val CategoryFood = Color(0xFF4CAF7D)
+val CategoryShopping = Color(0xFFE8A94C)
+val CategoryTransport = Color(0xFF5B8DEF)
+val CategoryLodging = Color(0xFFB479E0)
+val CategoryEtc = Color(0xFFBDBDBD)
