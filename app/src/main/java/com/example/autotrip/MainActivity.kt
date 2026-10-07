@@ -6,19 +6,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.example.autotrip.navigation.ExpenseFlow
-import com.example.autotrip.ui.auth.EmailLoginScreen
-import com.example.autotrip.ui.auth.GoogleLoginScreen
 import com.example.autotrip.ui.auth.LoginScreen
-import com.example.autotrip.ui.auth.SignUpCompleteScreen
-import com.example.autotrip.ui.auth.SignUpScreen
 import com.example.autotrip.ui.auth.SplashScreen
+import com.example.autotrip.ui.budget.BudgetDetailScreen
+import com.example.autotrip.ui.budget.BudgetMainScreen
+import com.example.autotrip.ui.budget.ExpenseEntryScreen
+import com.example.autotrip.ui.diary.TripLogDetailScreen
 import com.example.autotrip.ui.home.HomeScreen
 import com.example.autotrip.ui.plan.PlanScreen
+import com.example.autotrip.ui.plan.RecommendLoadingScreen
+import com.example.autotrip.ui.plan.RecommendResultScreen
 import com.example.autotrip.ui.plan.TripCreateScreen
+import com.example.autotrip.ui.plan.TripInviteScreen
 import com.example.autotrip.ui.theme.AutoTripTheme
 import kotlinx.coroutines.delay
 
@@ -36,11 +39,15 @@ class MainActivity : ComponentActivity() {
                 var showHome by remember { mutableStateOf(false) }
                 var showPlan by remember { mutableStateOf(false) }
                 var showTripCreate by remember { mutableStateOf(false) }
-                var showExpenseFlow by remember { mutableStateOf(false) }
-                var showSignUp by remember { mutableStateOf(false) }
-                var showEmailLogin by remember { mutableStateOf(false) }
-                var showSignUpComplete by remember { mutableStateOf(false) }
-                var showGoogleLogin by remember { mutableStateOf(false) }
+                var showRecommendLoading by remember { mutableStateOf(false) }
+                var showRecommendResult by remember { mutableStateOf(false) }
+                var showTripInvite by remember { mutableStateOf(false) }
+                var showTripLog by remember { mutableStateOf(false) }
+                var tripLogTitle by remember { mutableStateOf("") }
+                var homeTabIndex by remember { mutableIntStateOf(0) }
+                var showBudget by remember { mutableStateOf(false) }
+                var showBudgetDetail by remember { mutableStateOf(false) }
+                var showExpense by remember { mutableStateOf(false) }
 
                 // Splash 2.5초
                 LaunchedEffect(Unit) {
@@ -55,9 +62,60 @@ class MainActivity : ComponentActivity() {
                         SplashScreen()
                     }
 
+                    // 친구 초대
+                    showTripInvite -> {
+                        TripInviteScreen(
+                            onBackClick = {
+                                showTripInvite = false
+                                showRecommendResult = true
+                            },
+                            onNextClick = {
+                                showTripInvite = false
+                                showHome = true
+                            }
+                        )
+                    }
+
+                    // 추천 결과
+                    showRecommendResult -> {
+                        RecommendResultScreen(
+                            onBackClick = {
+                                showRecommendResult = false
+                            },
+                            onRegenerateClick = {
+                                showRecommendResult = false
+                                showRecommendLoading = true
+                            },
+                            onConfirmClick = {
+                                showRecommendResult = false
+                                showTripInvite = true
+                            }
+                        )
+                    }
+
+                    // 일정 생성 로딩
+                    showRecommendLoading -> {
+                        RecommendLoadingScreen(
+                            onFinished = {
+                                showRecommendLoading = false
+                                showRecommendResult = true
+                            }
+                        )
+                    }
+
                     // 2. 여행 정보 입력
                     showTripCreate -> {
-                        TripCreateScreen()
+                        TripCreateScreen(
+                            onBackClick = {
+                                showTripCreate = false
+                                showPlan = true
+                            },
+                            onCreateClick = {
+                                showTripCreate = false
+                                showPlan = false
+                                showRecommendLoading = true
+                            }
+                        )
                     }
 
                     // 3. 여행 계획 안내
@@ -73,11 +131,48 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // 경비 (01~12 화면 전환은 ExpenseFlow 안에서 처리)
-                    showExpenseFlow -> {
-                        ExpenseFlow(
-                            onExit = {
-                                showExpenseFlow = false
+                    // 4. 가계부 상세내역
+                    showBudgetDetail -> {
+                        BudgetDetailScreen(
+                            onBackClick = {
+                                showBudgetDetail = false
+                            }
+                        )
+                    }
+
+                    // 5. 지출 직접 입력
+                    showExpense -> {
+                        ExpenseEntryScreen(
+                            onBackClick = {
+                                showExpense = false
+                            },
+                            onSaveClick = {
+                                showExpense = false
+                            }
+                        )
+                    }
+
+                    // 6. 가계부
+                    showBudget -> {
+                        BudgetMainScreen(
+                            onBackClick = {
+                                showBudget = false
+                            },
+                            onSeeDetailClick = {
+                                showBudgetDetail = true
+                            },
+                            onManualAddClick = {
+                                showExpense = true
+                            }
+                        )
+                    }
+
+                    // 여행 로그 상세
+                    showTripLog -> {
+                        TripLogDetailScreen(
+                            tripTitle = tripLogTitle,
+                            onBackClick = {
+                                showTripLog = false
                             }
                         )
                     }
@@ -85,6 +180,12 @@ class MainActivity : ComponentActivity() {
                     // 5. 메인
                     showHome -> {
                         HomeScreen(
+                            selectedTabIndex = homeTabIndex,
+                            onTabChange = { homeTabIndex = it },
+                            onLogClick = { title ->
+                                tripLogTitle = title
+                                showTripLog = true
+                            },
                             onTravelClick = {
                                 showHome = true
                                 showPlan = true
@@ -93,59 +194,7 @@ class MainActivity : ComponentActivity() {
                                 showPlan = true
                             },
                             onNavigateToBudget = {
-                                showExpenseFlow = true
-                            }
-                        )
-                    }
-
-                    // 7. 회원가입 완료
-                    showSignUpComplete -> {
-                        SignUpCompleteScreen(
-                            onConfirmClick = {
-                                showSignUpComplete = false
-                                showEmailLogin = true
-                            }
-                        )
-                    }
-
-                    // 6. 회원가입
-                    showSignUp -> {
-                        SignUpScreen(
-                            onBackClick = {
-                                showSignUp = false
-                            },
-                            onSignUpComplete = {
-                                showSignUp = false
-                                showSignUpComplete = true
-                            }
-                        )
-                    }
-
-                    // 5-2. 이메일 로그인
-                    showEmailLogin -> {
-                        EmailLoginScreen(
-                            onBackClick = {
-                                showEmailLogin = false
-                            },
-                            onLoginClick = {
-                                showEmailLogin = false
-                                showHome = true
-                            },
-                            onFindIdClick = {
-                                // TODO: 아이디 찾기 화면 연결
-                            },
-                            onFindPasswordClick = {
-                                // TODO: 비밀번호 찾기 화면 연결
-                            }
-                        )
-                    }
-
-                    // Google 로그인 중간 화면
-                    showGoogleLogin -> {
-                        GoogleLoginScreen(
-                            onGoogleContinueClick = {
-                                showGoogleLogin = false
-                                showHome = true
+                                showBudget = true
                             }
                         )
                     }
@@ -154,13 +203,7 @@ class MainActivity : ComponentActivity() {
                     else -> {
                         LoginScreen(
                             onLoginClick = {
-                                showGoogleLogin = true
-                            },
-                            onEmailLoginClick = {
-                                showEmailLogin = true
-                            },
-                            onSignUpClick = {
-                                showSignUp = true
+                                showHome = true
                             }
                         )
                     }
